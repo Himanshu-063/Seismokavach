@@ -1,0 +1,2 @@
+# Seismokavach
+Our Project Prototype
