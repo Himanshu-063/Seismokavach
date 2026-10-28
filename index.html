@@ -99,3 +99,18 @@
                 </div>
             </div>
         </div>
+        <div class="flex items-center space-x-2.5">
+            <button onclick="runAIAgentScan()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-medium flex items-center space-x-2 shadow-lg shadow-cyan-950/50 transition border border-cyan-400/30">
+                <i class="fa-solid fa-brain text-cyan-200"></i>
+                <span>Run AI Agent Scan</span>
+            </button>
+            <button onclick="broadcastToAllSelected()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-medium flex items-center space-x-2 shadow-lg shadow-emerald-950/50 transition border border-emerald-400/30">
+                <i class="fa-solid fa-paper-plane text-emerald-200"></i>
+                <span>Dispatch All Alerts</span>
+            </button>
+            <button onclick="resetCameraView()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition border border-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span class="hidden md:inline">Reset Camera</span>
+            </button>
+        </div>
+    </header>
