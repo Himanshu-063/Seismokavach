@@ -942,3 +942,83 @@
                 svg.appendChild(circle);
             });
         }
+         /* =========================================================================
+           7. CAMERA PRESETS & RENDER MODES
+           ========================================================================= */
+        function setCameraPreset(preset) {
+            let targetPos = new THREE.Vector3();
+            let targetLook = new THREE.Vector3(0, 7, 0);
+
+            switch (preset) {
+                case 'iso':
+                    targetPos.set(38, 26, 42);
+                    break;
+                case 'front':
+                    targetPos.set(-2, 10, 36);
+                    break;
+                case 'staircase':
+                    targetPos.set(16, 12, 14);
+                    targetLook.set(5.5, 5.2, -3.2);
+                    break;
+                case 'top':
+                    targetPos.set(0, 65, 0.1);
+                    break;
+            }
+
+            animateCameraTo(targetPos, targetLook);
+        }
+
+        function resetCameraView() {
+            setCameraPreset('iso');
+        }
+
+        function animateCameraTo(targetPos, targetLookAt) {
+            let step = 0;
+            function animateCam() {
+                if (step < 25) {
+                    camera.position.lerp(targetPos, 0.12);
+                    if (controls) controls.target.lerp(targetLookAt, 0.12);
+                    step++;
+                    requestAnimationFrame(animateCam);
+                }
+            }
+            animateCam();
+        }
+
+        function focusOnDefect(id) {
+            const defect = defectsData.find(d => d.id === id);
+            if (!defect) return;
+            selectedDefect = defect;
+
+            const targetPos = new THREE.Vector3(defect.position.x + 10, defect.position.y + 4, defect.position.z + 10);
+            const targetLook = new THREE.Vector3(defect.position.x, defect.position.y, defect.position.z);
+            animateCameraTo(targetPos, targetLook);
+
+            document.querySelectorAll('.defect-card').forEach(c => c.classList.remove('active'));
+            const activeCard = document.getElementById(`card-${id}`);
+            if (activeCard) activeCard.classList.add('active');
+        }
+
+        function setRenderMode(mode) {
+            currentRenderMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => {
+                b.className = "mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2";
+            });
+            document.getElementById(`btn-mode-${mode}`).className = "mode-btn px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium border border-blue-500 transition text-left flex items-center gap-2 shadow-sm";
+
+            brickGroup.traverse(child => {
+                if (child.isMesh) {
+                    if (mode === 'wireframe') child.material = materials.wireframe;
+                    else if (mode === 'xray') child.material = materials.xray;
+                    else if (mode === 'heatmap') child.material = materials.heatmap;
+                    else child.material = child.userData.defaultMaterial || materials.redBrick;
+                }
+            });
+        }
+
+        function toggleLayer(layer, isVisible) {
+            if (layer === 'brick') brickGroup.visible = isVisible;
+            if (layer === 'columns') columnsGroup.visible = isVisible;
+            if (layer === 'stairs') stairsGroup.visible = isVisible;
+            if (layer === 'lawn') lawnGroup.visible = isVisible;
+        }
