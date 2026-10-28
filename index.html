@@ -827,3 +827,34 @@
                     columnsGroup.add(col);
                 }
             }
+
+             // 3. INNER CORNER EXTERNAL ZIG-ZAG WHITE STAIRCASE
+            // Located at the inner corner junction (around X: 5.5, Z: -3.2)
+            const stairX = 5.5;
+            const stairZ = -3.2;
+
+            for (let s = 0; s < stories; s++) {
+                const landingY = s * storyHeight + 0.6;
+
+                // Horizontal Stair Landing Pad
+                const landing = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.3, 3.5), materials.whiteConcrete);
+                landing.position.set(stairX, landingY, stairZ);
+                stairsGroup.add(landing);
+
+                // Diagonal Flight Staircase Beam (Zig-Zag Flight)
+                const flightGeo = new THREE.BoxGeometry(1.2, 0.3, 4.8);
+                const flight = new THREE.Mesh(flightGeo, materials.whiteConcrete);
+                flight.position.set(stairX + (s % 2 === 0 ? 0.8 : -0.8), landingY + storyHeight / 2, stairZ + 1.2);
+                flight.rotation.x = 0.55; // Diagonal slope
+                stairsGroup.add(flight);
+
+                // Vertical White Support Columns for Stair Shaft
+                const stairColA = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, storyHeight, 16), materials.whiteConcrete);
+                stairColA.position.set(stairX - 1.5, landingY + storyHeight / 2, stairZ - 1.5);
+                stairsGroup.add(stairColA);
+
+                const stairColB = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, storyHeight, 16), materials.whiteConcrete);
+                stairColB.position.set(stairX + 1.5, landingY + storyHeight / 2, stairZ - 1.5);
+                stairsGroup.add(stairColB);
+            }
+        
