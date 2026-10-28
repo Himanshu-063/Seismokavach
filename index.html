@@ -857,4 +857,88 @@
                 stairColB.position.set(stairX + 1.5, landingY + storyHeight / 2, stairZ - 1.5);
                 stairsGroup.add(stairColB);
             }
-        
+        /* =========================================================================
+           5. 3D DEFECT ANOMALY MARKERS & RADAR PULSES
+           ========================================================================= */
+        function createDefectVisualizers() {
+            defectsData.forEach(defect => {
+                const { x, y, z } = defect.position;
+                const isCritical = defect.severity === 'critical';
+                const isHigh = defect.severity === 'high';
+                const colorHex = isCritical ? 0xef4444 : (isHigh ? 0xf59e0b : 0xeab308);
+
+                // Glowing Center Orb
+                const orb = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.7, 16, 16),
+                    new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.95 })
+                );
+                orb.position.set(x, y, z);
+                defectMarkersGroup.add(orb);
+
+                // Radar Pulsing Wireframe Ring
+                const ring = new THREE.Mesh(
+                    new THREE.RingGeometry(0.9, 1.4, 24),
+                    new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.8 })
+                );
+                ring.position.set(x, y, z);
+                ring.rotation.x = Math.PI / 2;
+                ring.userData = { isPulse: true };
+                defectMarkersGroup.add(ring);
+
+                // Emissive Point Light
+                const pLight = new THREE.PointLight(colorHex, 2.5, 10);
+                pLight.position.set(x, y, z);
+                defectMarkersGroup.add(pLight);
+            });
+        }
+
+        /* =========================================================================
+           6. DYNAMIC 2D-TO-3D SVG CALLOUT OVERLAY ARROWS
+           ========================================================================= */
+        function updateSVGCallouts() {
+            const svg = document.getElementById('callout-svg');
+            svg.innerHTML = '';
+
+            const container = document.getElementById('canvas-container');
+            if (!container || !camera) return;
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || (window.innerHeight - 64);
+
+            defectsData.forEach(defect => {
+                if (currentFilter !== 'all' && defect.severity !== currentFilter) return;
+
+                const worldPos = new THREE.Vector3(defect.position.x, defect.position.y, defect.position.z);
+                const projected = worldPos.clone().project(camera);
+
+                if (projected.z > 1) return;
+
+                const targetX = (projected.x * 0.5 + 0.5) * width;
+                const targetY = (-(projected.y * 0.5) + 0.5) * height;
+
+                const cardEl = document.getElementById(`card-${defect.id}`);
+                if (!cardEl) return;
+                const rect = cardEl.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+
+                const sourceX = rect.left - containerRect.left;
+                const sourceY = rect.top + (rect.height / 2) - containerRect.top;
+
+                const dx = Math.abs(sourceX - targetX) * 0.45;
+                const strokeColor = defect.severity === 'critical' ? '#ef4444' : (defect.severity === 'high' ? '#f59e0b' : '#eab308');
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', `M ${targetX} ${targetY} C ${targetX + dx} ${targetY}, ${sourceX - dx} ${sourceY}, ${sourceX} ${sourceY}`);
+                path.setAttribute('stroke', strokeColor);
+                path.setAttribute('stroke-width', '2.5');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-dasharray', '5 4');
+                svg.appendChild(path);
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', targetX);
+                circle.setAttribute('cy', targetY);
+                circle.setAttribute('r', '6');
+                circle.setAttribute('fill', strokeColor);
+                svg.appendChild(circle);
+            });
+        }
