@@ -5,52 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismokavach</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Three.js v0.128.0 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- OrbitControls -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-        }
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* Glassmorphism Panel Styling */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.88);
+            background: rgba(15, 23, 42, 0.92);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .glass-card {
             background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.07);
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -60,248 +37,190 @@
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.25);
         }
 
-        /* SVG Dynamic Callout Overlay */
-        #callout-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 20;
-        }
+        #callout-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
 
-        /* Toast Animation */
-        @keyframes slideIn {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .toast-animate { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Toggle switch */
+        .switch { position: relative; width: 38px; height: 20px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; inset: 0; background: #334155; border-radius: 20px; cursor: pointer; transition: .25s; }
+        .slider:before { content: ""; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .25s; }
+        .switch input:checked + .slider { background: #10b981; }
+        .switch input:checked + .slider:before { transform: translateX(18px); }
     </style>
 </head>
 
 <body class="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden select-none">
 
-    <!-- TOP HEADER & NAVIGATION BAR -->
-    <header class="h-16 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-5 flex items-center justify-between z-30 shrink-0">
-        <!-- Brand Title & Integrity Status -->
-        <div class="flex items-center space-x-4">
-            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-rose-700 to-amber-600 flex items-center justify-center shadow-lg shadow-rose-900/30 border border-rose-500/30">
-                <i class="fa-solid fa-building-user text-white text-lg"></i>
+    <!-- ================= HEADER ================= -->
+    <header class="h-14 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-rose-700 to-amber-600 flex items-center justify-center shadow-lg border border-rose-500/30">
+                <i class="fa-solid fa-building-user text-white"></i>
             </div>
             <div>
-                <div class="flex items-center space-x-2.5"><button onclick="openReportsModal()"></button>
-                    <h1 class="font-bold text-sm md:text-base tracking-wide text-white">KIT BOYS HOSTEL <span class="text-xs font-normal text-rose-400 font-mono">BIM v4.5</span></h1>
-                    <span class="px-2 py-0.5 text-[10px] font-mono font-semibold bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-full flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
-                        <span id="header-anomaly-badge">5 Anomalies Detected</span>
-                    </span>
-                </div>
-                <div class="flex items-center space-x-3 text-xs text-slate-400 mt-0.5">
-                    <span class="flex items-center gap-1 text-emerald-400 font-mono">
-                        <i class="fa-solid fa-shield-halved text-xs"></i> Integrity Index: <strong id="header-health-idx" class="text-emerald-300">84%</strong>
-                    </span>
+                <h1 class="font-bold text-sm tracking-wide text-white leading-tight">
+                    SEISMOKAVACH <span class="text-xs font-normal text-rose-400 font-mono">· KIT Boys Hostel</span>
+                </h1>
+                <div class="flex items-center gap-2 text-[11px] text-slate-400">
+                    <span class="text-emerald-400 font-mono">Integrity: <strong id="header-health-idx">84%</strong></span>
                     <span class="text-slate-600">•</span>
-                    <span class="font-mono text-cyan-300">3-Story L-Block Structure</span>
+                    <span class="text-rose-400 font-mono"><span id="header-anomaly-badge">5 Anomalies</span></span>
                 </div>
             </div>
         </div>
 
-        <!-- Header Actions & AI Agent Button -->
-        <div class="flex items-center space-x-2.5">
-<button onclick="openReportsModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-medium flex items-center space-x-2 transition border border-amber-500/30">
-    <i class="fa-solid fa-file-contract text-amber-400"></i>
-    <span>Monthly & Yearly Reports</span>
-</button>
-            <button onclick="runAIAgentScan()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-medium flex items-center space-x-2 shadow-lg shadow-cyan-950/50 transition border border-cyan-400/30">
-                <i class="fa-solid fa-brain text-cyan-200"></i>
-                <span>Run AI Agent Scan</span>
+        <div class="flex items-center space-x-2">
+            <!-- REPORTS BUTTON -->
+            <button onclick="openReportsModal()" class="px-3.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-semibold flex items-center gap-2 transition border border-amber-500/40">
+                <i class="fa-solid fa-file-contract"></i>
+                <span>Reports</span>
             </button>
-            <button onclick="broadcastToAllSelected()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-medium flex items-center space-x-2 shadow-lg shadow-emerald-950/50 transition border border-emerald-400/30">
-                <i class="fa-solid fa-paper-plane text-emerald-200"></i>
-                <span>Dispatch All Alerts</span>
-            </button>
-            <button onclick="resetCameraView()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition border border-slate-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-rotate-left"></i>
-                <span class="hidden md:inline">Reset Camera</span>
+            <button onclick="runScan({ force: true })" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-2 transition">
+                <i class="fa-solid fa-brain"></i>
+                <span class="hidden sm:inline">Scan Now</span>
             </button>
         </div>
     </header>
 
-    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <!-- ================= MAIN ================= -->
     <div class="relative flex-1 flex flex-col md:flex-row overflow-hidden">
 
-        <!-- LEFT SIDEBAR: AUTHORITIES & BIM CONTROL PANEL -->
-        <aside class="w-full md:w-80 glass-panel border-r border-slate-800/80 flex flex-col z-30 shrink-0 overflow-y-auto max-h-[calc(100vh-4rem)]">
-            
-            <!-- 1. AUTHORITIES & EMERGENCY RECIPIENTS PANEL -->
-            <div class="p-4 border-b border-slate-800 bg-slate-900/40">
-                <div class="flex items-center justify-between mb-2.5">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-user-shield text-cyan-400 text-xs"></i>
-                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">Hostel Authorities</h2>
-                    </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">SMS / WhatsApp</span>
-                </div>
+        <!-- LEFT SIDEBAR -->
+        <aside class="w-full md:w-72 glass-panel border-r border-slate-800/80 flex flex-col z-30 shrink-0 overflow-y-auto md:max-h-[calc(100vh-3.5rem)]">
 
-                <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
-                    Select recipients to dispatch instant structural risk breakdown alerts to their mobile phones.
+            <!-- AUTO ALERTS -->
+            <div class="p-4 border-b border-slate-800">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-bell text-emerald-400 text-xs"></i>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">Auto Alerts</h2>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="auto-alert-toggle" checked onchange="setAutoAlerts(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
+                    Damage detect hote hi SMS + WhatsApp apne aap chala jayega.
                 </p>
 
-                <!-- Authority Recipient Cards -->
-                <div class="space-y-2.5" id="authorities-container">
-                    <!-- Populated dynamically via JS -->
+                <div class="flex items-center gap-2 text-[11px] font-mono mb-3 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800">
+                    <span id="monitor-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="monitor-status" class="text-slate-300">Monitoring…</span>
                 </div>
 
-                <!-- Mass Broadcast Trigger -->
-                <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                    <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
-                        <input type="checkbox" id="select-all-authorities" checked onchange="toggleSelectAllAuthorities(this)" class="rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-0">
-                        Select All
-                    </label>
-                    <button onclick="broadcastToAllSelected()" class="px-2.5 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-400 border border-cyan-500/30 text-[11px] font-semibold transition flex items-center gap-1.5">
-                        <i class="fa-brands fa-whatsapp"></i> Broadcast Selected
-                    </button>
-                </div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Recipients</div>
+                <div class="space-y-2" id="authorities-container"></div>
+
+                <button onclick="broadcastToAllSelected()" class="mt-3 w-full px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Send Alert Now
+                </button>
             </div>
 
-            <!-- 2. RENDER VIEW MODES -->
+            <!-- VIEW -->
             <div class="p-4 border-b border-slate-800">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">3D Rendering Mode</h2>
+                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">3D View</h2>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <button onclick="setRenderMode('solid')" id="btn-mode-solid" class="mode-btn px-2.5 py-1.5 rounded-lg bg-blue-600 text-white text-[11px] font-medium border border-blue-500 transition">Solid</button>
+                    <button onclick="setRenderMode('xray')" id="btn-mode-xray" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">X-Ray</button>
+                    <button onclick="setRenderMode('wireframe')" id="btn-mode-wireframe" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">Mesh</button>
+                    <button onclick="setRenderMode('heatmap')" id="btn-mode-heatmap" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">Heatmap</button>
+                </div>
+
+                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Camera</h2>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setRenderMode('solid')" id="btn-mode-solid" class="mode-btn px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium border border-blue-500 transition text-left flex items-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-building text-xs"></i> Brick & Concrete
-                    </button>
-                    <button onclick="setRenderMode('xray')" id="btn-mode-xray" class="mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2">
-                        <i class="fa-solid fa-eye text-xs"></i> X-Ray View
-                    </button>
-                    <button onclick="setRenderMode('wireframe')" id="btn-mode-wireframe" class="mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2">
-                        <i class="fa-solid fa-border-all text-xs"></i> Structural Mesh
-                    </button>
-                    <button onclick="setRenderMode('heatmap')" id="btn-mode-heatmap" class="mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2">
-                        <i class="fa-solid fa-fire text-xs"></i> Stress Heatmap
-                    </button>
+                    <button onclick="setCameraPreset('iso')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Isometric</button>
+                    <button onclick="setCameraPreset('front')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Front</button>
+                    <button onclick="setCameraPreset('staircase')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 border border-amber-500/30">Staircase</button>
+                    <button onclick="setCameraPreset('top')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Top Plan</button>
                 </div>
             </div>
 
-            <!-- 3. HOSTEL STRUCTURE LAYER TOGGLES -->
-            <div class="p-4 border-b border-slate-800">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Hostel Components</h2>
-                <div class="space-y-2">
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-cubes-stacked text-rose-500"></i> Red Brick Arch Facade</span>
-                        <input type="checkbox" id="toggle-brick" checked onchange="toggleLayer('brick', this.checked)" class="accent-cyan-500 rounded cursor-pointer">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-grip-lines-vertical text-slate-300"></i> White Circular Columns</span>
-                        <input type="checkbox" id="toggle-columns" checked onchange="toggleLayer('columns', this.checked)" class="accent-cyan-500 rounded cursor-pointer">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-[#000] fa-stairs text-amber-400"></i> Corner Zig-Zag Staircase</span>
-                        <input type="checkbox" id="toggle-stairs" checked onchange="toggleLayer('stairs', this.checked)" class="accent-cyan-500 rounded cursor-pointer">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-tree text-emerald-400"></i> Courtyard Lawn & Bushes</span>
-                        <input type="checkbox" id="toggle-lawn" checked onchange="toggleLayer('lawn', this.checked)" class="accent-cyan-500 rounded cursor-pointer">
-                    </label>
-                </div>
-            </div>
-
-            <!-- 4. CAMERA VIEW PRESETS -->
+            <!-- LAYERS -->
             <div class="p-4">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Camera Views</h2>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setCameraPreset('iso')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Isometric Wing</button>
-                    <button onclick="setCameraPreset('front')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Courtyard Front</button>
-                    <button onclick="setCameraPreset('staircase')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 border border-amber-500/30">Staircase Focus</button>
-                    <button onclick="setCameraPreset('top')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Top Floor Plan</button>
+                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Layers</h2>
+                <div class="space-y-1">
+                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-cubes-stacked text-rose-500 w-4"></i> Brick Facade</span>
+                        <input type="checkbox" checked onchange="toggleLayer('brick', this.checked)" class="accent-cyan-500 cursor-pointer">
+                    </label>
+                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-grip-lines-vertical text-slate-300 w-4"></i> Columns</span>
+                        <input type="checkbox" checked onchange="toggleLayer('columns', this.checked)" class="accent-cyan-500 cursor-pointer">
+                    </label>
+                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-stairs text-amber-400 w-4"></i> Staircase</span>
+                        <input type="checkbox" checked onchange="toggleLayer('stairs', this.checked)" class="accent-cyan-500 cursor-pointer">
+                    </label>
+                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-tree text-emerald-400 w-4"></i> Lawn & Bushes</span>
+                        <input type="checkbox" checked onchange="toggleLayer('lawn', this.checked)" class="accent-cyan-500 cursor-pointer">
+                    </label>
                 </div>
             </div>
         </aside>
 
-        <!-- 3D VIEWPORT CANVAS AREA -->
-        <div class="relative flex-1 bg-slate-950 overflow-hidden min-h-[450px]">
-            <!-- WebGL Canvas Container -->
+        <!-- 3D VIEWPORT -->
+        <div class="relative flex-1 bg-slate-950 overflow-hidden min-h-[400px]">
             <div id="canvas-container" class="relative w-full h-full cursor-grab active:cursor-grabbing"></div>
+            <svg id="callout-svg"></svg>
 
-            <!-- Dynamic SVG Callout Layer -->
-            <svg id="callout-svg" class="w-full h-full pointer-events-none z-10"></svg>
-
-            <!-- FLOATING HUD INFO OVERLAY (TOP CANVAS) -->
-            <div class="absolute top-4 right-4 glass-panel rounded-xl px-3.5 py-2 hidden sm:flex items-center space-x-4 text-xs font-mono text-slate-300 z-20">
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>FPS: <strong id="fps-counter" class="text-white">60</strong></span>
-                </div>
-                <div class="h-4 w-[1px] bg-slate-800"></div>
-                <div>DIST: <span id="cam-dist" class="text-cyan-300">45m</span></div>
-                <div class="h-4 w-[1px] bg-slate-800"></div>
-                <div>MODEL: <span class="text-rose-400 font-semibold">KIT Boys Hostel</span></div>
+            <div class="absolute top-3 right-3 glass-panel rounded-lg px-3 py-1.5 hidden sm:flex items-center space-x-3 text-[11px] font-mono text-slate-300 z-20">
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>FPS <strong id="fps-counter" class="text-white">60</strong></span>
+                <span class="text-slate-700">|</span>
+                <span>DIST <span id="cam-dist" class="text-cyan-300">45m</span></span>
             </div>
 
-            <!-- NAVIGATION HELPER GUIDE -->
-            <div class="absolute bottom-4 left-4 glass-panel px-3.5 py-2 rounded-xl border border-slate-800 text-slate-400 text-xs flex items-center space-x-4 z-20">
-                <span class="flex items-center gap-1.5"><i class="fa-solid fa-computer-mouse text-cyan-400"></i> Left Drag: Orbit</span>
-                <span class="flex items-center gap-1.5"><i class="fa-solid fa-up-down-left-right text-cyan-400"></i> Right Drag: Pan</span>
-                <span class="flex items-center gap-1.5"><i class="fa-solid fa-magnifying-glass-plus text-cyan-400"></i> Scroll: Zoom</span>
+            <div class="absolute bottom-3 left-3 glass-panel px-3 py-1.5 rounded-lg text-slate-400 text-[11px] hidden sm:flex items-center space-x-4 z-20">
+                <span><i class="fa-solid fa-computer-mouse text-cyan-400 mr-1"></i>Drag: Orbit</span>
+                <span><i class="fa-solid fa-up-down-left-right text-cyan-400 mr-1"></i>Right Drag: Pan</span>
+                <span><i class="fa-solid fa-magnifying-glass-plus text-cyan-400 mr-1"></i>Scroll: Zoom</span>
             </div>
         </div>
 
-        <!-- RIGHT SIDEBAR: DETECTED WEAK SPOTS (KIT HOSTEL ANOMALIES) -->
-        <aside id="sidebar" class="w-full md:w-96 glass-panel border-l border-slate-800/80 flex flex-col z-30 shrink-0">
-            
+        <!-- RIGHT SIDEBAR: WEAK SPOTS -->
+        <aside id="sidebar" class="w-full md:w-80 glass-panel border-l border-slate-800/80 flex flex-col z-30 shrink-0 md:max-h-[calc(100vh-3.5rem)]">
             <div class="p-4 border-b border-slate-800">
                 <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-2">
+                    <div class="flex items-center gap-2">
                         <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
-                        <h2 class="font-bold text-sm tracking-wide text-white uppercase">Hostel Weak Spots (5)</h2>
+                        <h2 class="font-bold text-sm tracking-wide text-white uppercase">Weak Spots</h2>
                     </div>
-                    <span class="px-2 py-0.5 text-xs font-mono font-bold bg-rose-500/20 text-rose-400 rounded-full border border-rose-500/30">Active</span>
                 </div>
-
-                <!-- Severity Filters -->
                 <div class="flex items-center space-x-1 p-1 rounded-lg bg-slate-950 border border-slate-800 text-xs">
-                    <button onclick="filterDefects('all')" id="filter-all" class="filter-tab flex-1 py-1 rounded-md bg-blue-600 text-white font-medium transition">All (5)</button>
-                    <button onclick="filterDefects('critical')" id="filter-critical" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Critical (2)</button>
-                    <button onclick="filterDefects('high')" id="filter-high" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">High (2)</button>
-                    <button onclick="filterDefects('medium')" id="filter-medium" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Med (1)</button>
+                    <button onclick="filterDefects('all')" id="filter-all" class="filter-tab flex-1 py-1 rounded-md bg-blue-600 text-white font-medium transition">All</button>
+                    <button onclick="filterDefects('critical')" id="filter-critical" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Critical</button>
+                    <button onclick="filterDefects('high')" id="filter-high" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">High</button>
+                    <button onclick="filterDefects('medium')" id="filter-medium" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Med</button>
                 </div>
             </div>
 
-            <!-- Defect Cards Scroll Container -->
-            <div class="flex-1 overflow-y-auto p-3.5 space-y-3" id="weak-spots-list">
-                <!-- Dynamically populated via JS -->
-            </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="weak-spots-list"></div>
 
-            <!-- Footer Telemetry Sync Brief -->
             <div class="p-3 border-t border-slate-800 bg-slate-950/90 text-xs">
-                <div class="flex items-center justify-between text-slate-400 mb-1">
-                    <span>IoT Sensor Network:</span>
+                <div class="flex items-center justify-between text-slate-400">
+                    <span>IoT Sensors</span>
                     <span class="text-emerald-400 font-mono font-medium flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE (18 CH)
                     </span>
                 </div>
-                <p class="text-[11px] text-slate-500 leading-tight">
-                    Ultrasonic crack gauges, settlement inclinometers & strain sensors synced with BIM.
-                </p>
             </div>
         </aside>
-
     </div>
 
-    
-    
-    
-    <!-- DEEP DIAGNOSTIC INSPECTION MODAL -->
-    <div id="detail-modal" class="hidden fixed inset-0 z-50 glass-panel bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <!-- ================= DEFECT DETAIL MODAL ================= -->
+    <div id="detail-modal" onclick="if(event.target===this) closeModal()" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col">
-            
-            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+
+            <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
                 <div class="flex items-center space-x-3">
                     <span id="modal-severity-badge" class="px-2.5 py-1 text-xs font-bold font-mono rounded bg-rose-500/20 text-rose-400 border border-rose-500/40">CRITICAL</span>
                     <div>
-                        <h3 id="modal-title" class="font-bold text-base text-white">Pillar A2 Compression Crack</h3>
-                        <div id="modal-sensor-id" class="text-xs font-mono text-cyan-400">SENSOR #KIT-G-P2</div>
+                        <h3 id="modal-title" class="font-bold text-sm text-white">Title</h3>
+                        <div id="modal-sensor-id" class="text-xs font-mono text-cyan-400">SENSOR</div>
                     </div>
                 </div>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
@@ -309,177 +228,100 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Photo -->
                     <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Drone Inspection Photo</span>
-                        <div class="h-44 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 relative">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Inspection Photo</span>
+                        <div class="h-44 rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
                             <img id="modal-photo" src="" alt="Damage Photo" class="w-full h-full object-cover">
-                            <span class="absolute bottom-2 left-2 text-[10px] font-mono bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">CAM #KIT-HOSTEL-02</span>
                         </div>
                     </div>
-
-                    <!-- 24hr Telemetry Chart -->
                     <div class="space-y-1">
                         <div class="flex items-center justify-between text-[10px] font-bold uppercase font-mono text-slate-400">
-                            <span>24hr Strain Sensor Curve</span>
-                            <span class="text-rose-400" id="modal-stress-val">44.2 MPa</span>
+                            <span>24hr Strain Curve</span>
+                            <span class="text-rose-400" id="modal-stress-val">--</span>
                         </div>
                         <div class="h-44 bg-slate-950 rounded-xl border border-slate-800 p-2 flex flex-col justify-between">
                             <canvas id="chart-canvas" class="w-full h-32"></canvas>
                             <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-800/80">
-                                <span>Safety Factor: <strong id="modal-safety-factor" class="text-rose-400">1.12</strong></span>
-                                <span>Status: <strong class="text-amber-400">High Stress</strong></span>
+                                <span>Safety Factor: <strong id="modal-safety-factor" class="text-rose-400">--</strong></span>
+                                <span id="modal-extra" class="text-amber-400">--</span>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Coordinates & Diagnostic Action -->
-                <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Location & Coordinates</span>
-                    <div id="modal-coords" class="text-xs font-semibold text-slate-200 bg-slate-950 p-2.5 rounded-xl border border-slate-800 font-mono">Ground Floor Corridor Pillar A2</div>
                 </div>
 
                 <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Recommended Structural Remediation</span>
-                    <p id="modal-action-plan" class="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                        Install temporary hydraulic shoring props. Wrap damaged column with carbon fiber jacket (CFRP) and inject low-viscosity structural epoxy.
-                    </p>
-                </div>
-                <!-- MONTHLY & YEARLY BUILDING REPAIR & DAMAGE REPORT MODAL -->
-<div id="reports-modal" class="hidden fixed inset-0 z-50 glass-panel bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col">
-        
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-                    <i class="fa-solid fa-file-lines"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-base text-white">Structural Maintenance & Damage Reports</h3>
-                    <p class="text-xs text-slate-400">KIT Boys Hostel - Historical Audit Log</p>
-                </div>
-            </div>
-            <button onclick="closeReportsModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-        </div>
-
-        <!-- Body Content -->
-        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-            
-            <!-- Report Type Toggle Tabs -->
-            <div class="flex items-center space-x-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
-                <button onclick="switchReportTab('monthly')" id="tab-monthly-btn" class="flex-1 py-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold transition">
-                    <i class="fa-solid fa-calendar-days mr-1.5"></i> Monthly Repair Log (October 2026)
-                </button>
-                <button onclick="switchReportTab('yearly')" id="tab-yearly-btn" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition font-semibold">
-                    <i class="fa-solid fa-chart-line mr-1.5"></i> Yearly Damage Audit (2026 Summary)
-                </button>
-            </div>
-
-            <!-- MONTHLY REPORT VIEW -->
-            <div id="monthly-report-view" class="space-y-4">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                        <div class="text-[10px] uppercase font-mono text-slate-400">Repairs Conducted</div>
-                        <div class="text-base font-bold text-emerald-400 mt-0.5">4 Tasks</div>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                        <div class="text-[10px] uppercase font-mono text-slate-400">Epoxy Grout Injected</div>
-                        <div class="text-base font-bold text-cyan-400 mt-0.5">14.5 Liters</div>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                        <div class="text-[10px] uppercase font-mono text-slate-400">Maintenance Cost</div>
-                        <div class="text-base font-bold text-amber-400 mt-0.5">₹ 1,42,000</div>
-                    </div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Recommended Remediation</span>
+                    <p id="modal-action-plan" class="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800"></p>
                 </div>
 
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Recent Repair Log Entries</div>
-                    <div class="space-y-2 text-xs">
-                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-                            <div>
-                                <div class="font-semibold text-slate-200">CFRP Column Jacking (Pillar A2)</div>
-                                <div class="text-[10px] text-slate-400 font-mono">Date: Oct 12, 2026 • Vendor: UltraTech Structural</div>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">COMPLETED</span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-                            <div>
-                                <div class="font-semibold text-slate-200">Staircase Landing Dowel Anchoring</div>
-                                <div class="text-[10px] text-slate-400 font-mono">Date: Oct 22, 2026 • Structural Team B</div>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30">IN PROGRESS</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEARLY REPORT VIEW (Hidden by default) -->
-            <div id="yearly-report-view" class="hidden space-y-4">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                        <div class="text-[10px] uppercase font-mono text-slate-400">Total Anomalies Identified</div>
-                        <div class="text-base font-bold text-rose-400 mt-0.5">23 Anomalies</div>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                        <div class="text-[10px] uppercase font-mono text-slate-400">Seismic Stress Mitigation</div>
-                        <div class="text-base font-bold text-emerald-400 mt-0.5">+18% Integrity</div>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                        <div class="text-[10px] uppercase font-mono text-slate-400">Annual Retrofit Budget</div>
-                        <div class="text-base font-bold text-cyan-400 mt-0.5">₹ 8,75,000</div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Annual Degradation Trend</div>
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        During 2026, structural health index dropped by 4.2% due to monsoon seepage at the plinth base. 
-                        Carbon-fiber wrapping on Ground Floor columns successfully stabilized load redistribution across Wings A and B.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Footer Actions -->
-        <div class="px-6 py-3 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between">
-            <span class="text-xs text-slate-400 font-mono">Export PDF / CSV log available</span>
-            <button onclick="showToast('Downloading Structural Audit Report...', 'success')" class="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-download"></i> Download Audit Report
-            </button>
-        </div>
-    </div>
-</div>
-
-
-                <!-- WhatsApp/SMS Dispatch for Specific Defect -->
                 <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
-                    <span class="text-xs text-slate-400">Dispatch alert for this defect:</span>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="dispatchDefectWhatsApp()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
-                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                        </button>
-                        <button onclick="dispatchDefectSMS()" class="px-3 py-1.5 rounded-lg bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
-                            <i class="fa-solid fa-comment-sms"></i> SMS
-                        </button>
-                    </div>
+                    <span class="text-xs text-slate-400">Is defect ka alert bhejo:</span>
+                    <button onclick="dispatchDefectAlert()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-paper-plane"></i> WhatsApp + SMS
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TOAST POPUP CONTAINER -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <!-- ================= REPORTS MODAL (MONTHLY / YEARLY) ================= -->
+    <div id="reports-modal" onclick="if(event.target===this) closeReportsModal()" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col">
 
-    <!-- JAVASCRIPT LOGIC & THREE.JS ENGINE -->
+            <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-white">Damage & Repair Reports</h3>
+                        <p class="text-xs text-slate-400">KIT Boys Hostel · Audit Log</p>
+                    </div>
+                </div>
+                <button onclick="closeReportsModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                <div class="flex items-center space-x-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                    <button onclick="switchReportTab('monthly')" id="tab-monthly-btn" class="flex-1 py-2 rounded-lg font-semibold transition">
+                        <i class="fa-solid fa-calendar-days mr-1.5"></i> Monthly
+                    </button>
+                    <button onclick="switchReportTab('yearly')" id="tab-yearly-btn" class="flex-1 py-2 rounded-lg font-semibold transition">
+                        <i class="fa-solid fa-chart-line mr-1.5"></i> Yearly
+                    </button>
+                </div>
+
+                <div id="report-content" class="space-y-4"></div>
+            </div>
+
+            <div class="px-5 py-3 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between">
+                <span class="text-xs text-slate-400 font-mono">CSV export available</span>
+                <button onclick="downloadReport()" class="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-download"></i> Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
     <script>
-        /*           1. HOSTEL AUTHORITIES DATA & ALERT DISPATCH SYSTEM         */
+        /* =====================================================================
+           0. CONFIG  (yahin se settings badlo)
+        ===================================================================== */
+        const CONFIG = {
+            ALERT_API: 'http://localhost:3000',   // server.js ka URL (deploy kiya ho to wahan ka URL)
+            SCAN_INTERVAL_MS: 60 * 1000,          // har 60 sec mein auto scan
+            CRITICAL_SAFETY_FACTOR: 1.2           // isse kam safety factor = critical damage
+        };
+
+        /* =====================================================================
+           1. AUTHORITIES
+        ===================================================================== */
         const authoritiesData = [
             {
                 id: 'auth-1',
@@ -488,31 +330,21 @@
                 phone: '+91 6393670469',
                 rawPhone: '916393670469',
                 selected: true
-            }, 
-            ];
+            }
+            // Aur authority add karni ho to upar jaisa ek object aur daal do
+        ];
 
         function renderAuthoritiesList() {
             const container = document.getElementById('authorities-container');
             container.innerHTML = authoritiesData.map(auth => `
-                <div class="glass-card p-2.5 rounded-xl flex items-center justify-between gap-2 border border-slate-800 hover:border-slate-700 transition">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="${auth.id}" ${auth.selected ? 'checked' : ''} onchange="toggleAuthoritySelection('${auth.id}', this.checked)" class="accent-cyan-500 rounded cursor-pointer">
-                        <div>
-                            <div class="text-xs font-bold text-slate-100">${auth.name}</div>
-                            <div class="text-[10px] text-slate-400 font-medium">${auth.role}</div>
-                            <div class="text-[10px] font-mono text-slate-500">${auth.phone}</div>
-                        </div>
+                <label class="glass-card p-2.5 rounded-xl flex items-center gap-2.5 cursor-pointer">
+                    <input type="checkbox" ${auth.selected ? 'checked' : ''} onchange="toggleAuthoritySelection('${auth.id}', this.checked)" class="accent-cyan-500 cursor-pointer">
+                    <div class="min-w-0">
+                        <div class="text-xs font-bold text-slate-100 truncate">${auth.name}</div>
+                        <div class="text-[10px] text-slate-400">${auth.role}</div>
+                        <div class="text-[10px] font-mono text-slate-500">${auth.phone}</div>
                     </div>
-                    
-                    <div class="flex items-center gap-1">
-                        <button onclick="sendWhatsAppTo('${auth.id}')" title="WhatsApp Alert" class="w-7 h-7 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs transition">
-                            <i class="fa-brands fa-whatsapp"></i>
-                        </button>
-                        <button onclick="sendSMSTo('${auth.id}')" title="SMS Alert" class="w-7 h-7 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-xs transition">
-                            <i class="fa-solid fa-comment-sms"></i>
-                        </button>
-                    </div>
-                </div>
+                </label>
             `).join('');
         }
 
@@ -521,80 +353,39 @@
             if (auth) auth.selected = isChecked;
         }
 
-        function toggleSelectAllAuthorities(checkbox) {
-            authoritiesData.forEach(a => {
-                a.selected = checkbox.checked;
-                const el = document.getElementById(a.id);
-                if (el) el.checked = checkbox.checked;
-            });
+        function getSelectedAuthorities() {
+            return authoritiesData.filter(a => a.selected);
         }
 
-        function generateBuildingSummaryReport() {
-            return encodeURIComponent(
-                `🚨 *Seismokavach- KIT BOYS HOSTEL*\n` +
-                `Building Health Index: *84% (MODERATE RISK)*\n` +
-                `Active Defects: 5 Total (2 CRITICAL)\n\n` +
-                `*Critical Issues Highlighted:*\n` +
-                `1. Ground Floor Corridor Pillar A2: Vertical Shear Compression Crack (44.2 MPa stress)\n` +
-                `2. Corner Zig-Zag Staircase Joint: Flight Displacement (14.2 mm drift)\n\n` +
-                `Full telemetry data & 3D coordinate model logged on BIM server.`
-            );
-        }
-
-        function sendWhatsAppTo(authId) {
-            const auth = authoritiesData.find(a => a.id === authId);
-            if (!auth) return;
-            const text = generateBuildingSummaryReport();
-            window.open(`https://api.whatsapp.com/send?phone=${auth.rawPhone}&text=${text}`, '_blank');
-            showToast(`WhatsApp alert dispatched to ${auth.name} (${auth.role})`, 'success');
-        }
-
-        function sendSMSTo(authId) {
-            const auth = authoritiesData.find(a => a.id === authId);
-            if (!auth) return;
-            const text = generateBuildingSummaryReport();
-            window.open(`sms:${auth.rawPhone}?body=${text}`, '_blank');
-            showToast(`SMS alert dispatched to ${auth.name} (${auth.role})`, 'info');
-        }
-
-        function broadcastToAllSelected() {
-            const selected = authoritiesData.filter(a => a.selected);
-            if (selected.length === 0) {
-                showToast('Select at least one authority recipient.', 'error');
-                return;
-            }
-            selected.forEach(auth => sendWhatsAppTo(auth.id));
-            showToast(`Broadcast dispatches sent to ${selected.length} authorities!`, 'success');
-        }
-
+        /* =====================================================================
+           2. TOAST
+        ===================================================================== */
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
             const colors = {
                 success: 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200',
                 error: 'bg-rose-950/90 border-rose-500/50 text-rose-200',
                 info: 'bg-cyan-950/90 border-cyan-500/50 text-cyan-200'
             };
-
             const icons = {
                 success: 'fa-circle-check text-emerald-400',
                 error: 'fa-circle-exclamation text-rose-400',
                 info: 'fa-circle-info text-cyan-400'
             };
-
-            toast.className = `toast-animate pointer-events-auto px-4 py-3 rounded-xl border ${colors[type]} shadow-xl flex items-center gap-3 backdrop-blur-md text-xs font-medium`;
+            toast.className = `toast-animate pointer-events-auto px-4 py-3 rounded-xl border ${colors[type]} shadow-xl flex items-center gap-3 backdrop-blur-md text-xs font-medium max-w-sm`;
             toast.innerHTML = `<i class="fa-solid ${icons[type]} text-base"></i> <span>${message}</span>`;
-            
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
-            }, 4000);
+            }, 4500);
         }
 
-        /*            2. KIT BOYS HOSTEL DEFECT ANOMALIES DATA      */
+        /* =====================================================================
+           3. DEFECT DATA
+        ===================================================================== */
         const defectsData = [
             {
                 id: 'defect-1',
@@ -604,6 +395,7 @@
                 photo: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=600&q=80',
                 sensorId: 'KIT-G-P2',
                 metrics: { stress: '44.2 MPa', safetyFactor: '1.12', crackWidth: '4.8 mm' },
+                extra: 'Crack: 4.8 mm',
                 action: 'Install temporary hydraulic shoring props. Wrap damaged column with carbon fiber jacket (CFRP) and inject low-viscosity structural epoxy resin.'
             },
             {
@@ -614,6 +406,7 @@
                 photo: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=600&q=80',
                 sensorId: 'KIT-STR-L1',
                 metrics: { stress: '51.8 MPa', safetyFactor: '1.08', displacement: '14.2 mm' },
+                extra: 'Drift: 14.2 mm',
                 action: 'Anchor stainless steel dowel plates at landing beam connection. Restrict heavy student traffic on inner corner staircase.'
             },
             {
@@ -624,6 +417,7 @@
                 photo: 'https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=600&q=80',
                 sensorId: 'KIT-L2-ARCH',
                 metrics: { stress: '32.5 MPa', safetyFactor: '1.35', mortarLoss: '18%' },
+                extra: 'Mortar loss: 18%',
                 action: 'Rake out deteriorated mortar joints and perform pressure repointing with polymer-modified structural mortar.'
             },
             {
@@ -634,6 +428,7 @@
                 photo: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=600&q=80',
                 sensorId: 'KIT-L1-RAIL',
                 metrics: { stress: '28.1 MPa', safetyFactor: '1.42', rustDepth: '2.4 mm' },
+                extra: 'Rust: 2.4 mm',
                 action: 'Remove spalled concrete around balcony railing posts, treat rebar with zinc-rich primer, and grout epoxy anchors.'
             },
             {
@@ -644,6 +439,7 @@
                 photo: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
                 sensorId: 'KIT-PLINTH-E',
                 metrics: { stress: '19.4 MPa', safetyFactor: '1.75', settlement: '9.5 mm' },
+                extra: 'Settlement: 9.5 mm',
                 action: 'Execute polyurethane expanding grout injection into sub-grade foundation soil near east courtyard wing.'
             }
         ];
@@ -651,39 +447,37 @@
         let currentFilter = 'all';
         let selectedDefect = null;
 
+        function severityBadge(sev) {
+            if (sev === 'critical') return 'bg-rose-500/20 text-rose-400 border border-rose-500/30';
+            if (sev === 'high') return 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
+        }
+
         function renderWeakSpotsList() {
             const container = document.getElementById('weak-spots-list');
             const filtered = defectsData.filter(d => currentFilter === 'all' || d.severity === currentFilter);
-            
+
             container.innerHTML = filtered.map(defect => `
-                <div id="card-${defect.id}" onclick="focusOnDefect('${defect.id}')" class="defect-card glass-card p-3 rounded-xl cursor-pointer border border-slate-800 hover:border-cyan-500/50 transition group relative overflow-hidden">
-                    <div class="flex items-start justify-between gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                            defect.severity === 'critical' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                            defect.severity === 'high' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                            'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                        }">
-                            ${defect.severity}
-                        </span>
+                <div id="card-${defect.id}" onclick="focusOnDefect('${defect.id}')" class="defect-card glass-card p-3 rounded-xl cursor-pointer group ${selectedDefect && selectedDefect.id === defect.id ? 'active' : ''}">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${severityBadge(defect.severity)}">${defect.severity}</span>
                         <span class="text-[10px] font-mono text-cyan-400">${defect.sensorId}</span>
                     </div>
-
                     <div class="flex gap-3">
-                        <img src="${defect.photo}" class="w-16 h-16 rounded-lg object-cover border border-slate-700 shrink-0 group-hover:scale-105 transition" />
+                        <img src="${defect.photo}" class="w-14 h-14 rounded-lg object-cover border border-slate-700 shrink-0" />
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-xs font-bold text-slate-100 group-hover:text-cyan-400 transition truncate">${defect.title}</h3>
-                            <div class="text-[11px] font-mono text-slate-400 mt-1">Stress: <strong class="text-slate-200">${defect.metrics.stress}</strong></div>
-                            <div class="text-[11px] font-mono text-slate-400">Safety Factor: <strong class="${defect.severity === 'critical' ? 'text-rose-400' : 'text-emerald-400'}">${defect.metrics.safetyFactor}</strong></div>
+                            <h3 class="text-xs font-bold text-slate-100 group-hover:text-cyan-400 transition line-clamp-2">${defect.title}</h3>
+                            <div class="text-[11px] font-mono text-slate-400 mt-1">
+                                SF: <strong class="${parseFloat(defect.metrics.safetyFactor) < CONFIG.CRITICAL_SAFETY_FACTOR ? 'text-rose-400' : 'text-emerald-400'}">${defect.metrics.safetyFactor}</strong>
+                                · ${defect.metrics.stress}
+                            </div>
                         </div>
                     </div>
-
-                    <div class="mt-2.5 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+                    <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
                         <button onclick="event.stopPropagation(); openDetailModal('${defect.id}')" class="text-cyan-400 hover:underline font-semibold flex items-center gap-1">
-                            <i class="fa-solid fa-chart-line"></i> Inspect Telemetry
+                            <i class="fa-solid fa-chart-line"></i> Details
                         </button>
-                        <span class="text-slate-400 group-hover:text-cyan-300 flex items-center gap-1">
-                            Focus 3D <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </span>
+                        <span class="text-slate-500 group-hover:text-cyan-300">Focus 3D <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
                     </div>
                 </div>
             `).join('');
@@ -699,18 +493,381 @@
             renderWeakSpotsList();
         }
 
-        /* 
-           3. THREE.JS PROCEDURAL KIT BOYS HOSTEL MODEL */
+        function updateHeaderBadge() {
+            document.getElementById('header-anomaly-badge').textContent = `${defectsData.length} Anomalies`;
+        }
+
+        /* =====================================================================
+           4. AUTOMATIC ALERT ENGINE  (WhatsApp + SMS via server.js)
+        ===================================================================== */
+        let autoAlertsOn = true;
+        let monitorTimer = null;
+        let scanInProgress = false;
+
+        // Damage detect karne ka rule
+        function detectDamage() {
+            return defectsData.filter(d =>
+                d.severity === 'critical' ||
+                parseFloat(d.metrics.safetyFactor) < CONFIG.CRITICAL_SAFETY_FACTOR
+            );
+        }
+
+        // Server ko sirf zaroori fields bhejo
+        function slimDefect(d) {
+            return { id: d.id, title: d.title, severity: d.severity, sensorId: d.sensorId, metrics: d.metrics, action: d.action };
+        }
+
+        // Asli sender: server.js ko call karta hai, wahi SMS + WhatsApp bhejta hai
+        async function sendAlertsViaServer(recipients, defects, { force = false } = {}) {
+            if (!recipients.length) {
+                showToast('Kam se kam ek recipient select karo.', 'error');
+                return false;
+            }
+            try {
+                const res = await fetch(`${CONFIG.ALERT_API}/api/alerts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recipients: recipients.map(r => ({ name: r.name, phone: '+' + r.rawPhone })),
+                        defects: defects.map(slimDefect),
+                        health: '84% (MODERATE RISK)',
+                        force
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Server error');
+
+                let anySent = false;
+                data.results.forEach(r => {
+                    if (r.skipped) {
+                        showToast(`${r.name}: skip (${r.skipped})`, 'info');
+                        return;
+                    }
+                    const smsOk = r.sms && r.sms.ok;
+                    const waOk = r.whatsapp && r.whatsapp.ok;
+                    if (smsOk || waOk) anySent = true;
+                    showToast(`${r.name}: SMS ${smsOk ? '✔' : '✖'} | WhatsApp ${waOk ? '✔' : '✖'}`, (smsOk || waOk) ? 'success' : 'error');
+                });
+                return anySent;
+            } catch (err) {
+                showToast(`Alert server se connect nahi hua (${err.message}). server.js chalu hai?`, 'error');
+                return false;
+            }
+        }
+
+        // Scan: damage mila to automatic alert
+        async function runScan({ force = false } = {}) {
+            if (scanInProgress) return;
+            scanInProgress = true;
+            setMonitorStatus('Scanning…', 'amber');
+
+            await new Promise(r => setTimeout(r, 800)); // scan animation delay
+
+            const damaged = detectDamage();
+            const stamp = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            if (damaged.length > 0) {
+                showToast(`🚨 ${damaged.length} critical damage detect hua!`, 'error');
+                if (autoAlertsOn || force) {
+                    await sendAlertsViaServer(getSelectedAuthorities(), damaged, { force: false });
+                }
+                setMonitorStatus(`${damaged.length} critical · last scan ${stamp}`, 'rose');
+            } else {
+                setMonitorStatus(`All normal · last scan ${stamp}`, 'emerald');
+                if (force) showToast('Scan complete: sab kuch normal hai.', 'success');
+            }
+            scanInProgress = false;
+        }
+
+        function setMonitorStatus(text, color) {
+            const dot = document.getElementById('monitor-dot');
+            const label = document.getElementById('monitor-status');
+            const map = { emerald: 'bg-emerald-400', amber: 'bg-amber-400', rose: 'bg-rose-500', slate: 'bg-slate-500' };
+            dot.className = `w-2 h-2 rounded-full animate-pulse ${map[color] || map.slate}`;
+            label.textContent = text;
+        }
+
+        function startAutoMonitor() {
+            if (monitorTimer) return;
+            runScan();
+            monitorTimer = setInterval(runScan, CONFIG.SCAN_INTERVAL_MS);
+        }
+
+        function stopAutoMonitor() {
+            clearInterval(monitorTimer);
+            monitorTimer = null;
+        }
+
+        function setAutoAlerts(on) {
+            autoAlertsOn = on;
+            if (on) {
+                startAutoMonitor();
+                showToast('Auto alerts ON', 'success');
+            } else {
+                stopAutoMonitor();
+                setMonitorStatus('Auto alerts OFF', 'slate');
+                showToast('Auto alerts OFF', 'info');
+            }
+        }
+
+        // Manual button: abhi turant bhejo (cooldown ignore)
+        function broadcastToAllSelected() {
+            const damaged = detectDamage();
+            if (!damaged.length) {
+                showToast('Abhi koi critical damage nahi hai.', 'info');
+                return;
+            }
+            sendAlertsViaServer(getSelectedAuthorities(), damaged, { force: true });
+        }
+
+        // Ek defect ka alert (modal se)
+        function dispatchDefectAlert() {
+            if (!selectedDefect) return;
+            sendAlertsViaServer(getSelectedAuthorities(), [selectedDefect], { force: true });
+        }
+
+        /* =====================================================================
+           5. DEFECT DETAIL MODAL
+        ===================================================================== */
+        function showModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+        }
+        function hideModal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+
+        function openDetailModal(id) {
+            const d = defectsData.find(x => x.id === id);
+            if (!d) return;
+            selectedDefect = d;
+
+            const badge = document.getElementById('modal-severity-badge');
+            badge.textContent = d.severity.toUpperCase();
+            badge.className = `px-2.5 py-1 text-xs font-bold font-mono rounded ${severityBadge(d.severity)}`;
+
+            document.getElementById('modal-title').textContent = d.title;
+            document.getElementById('modal-sensor-id').textContent = `SENSOR #${d.sensorId}`;
+            document.getElementById('modal-photo').src = d.photo;
+            document.getElementById('modal-stress-val').textContent = d.metrics.stress;
+            document.getElementById('modal-safety-factor').textContent = d.metrics.safetyFactor;
+            document.getElementById('modal-extra').textContent = d.extra || '';
+            document.getElementById('modal-action-plan').textContent = d.action;
+
+            showModal('detail-modal');
+            requestAnimationFrame(() => drawStrainChart(d));
+        }
+
+        function closeModal() { hideModal('detail-modal'); }
+
+        // Simple 24hr strain curve (seeded, taaki har baar same dikhe)
+        function drawStrainChart(d) {
+            const canvas = document.getElementById('chart-canvas');
+            const dpr = window.devicePixelRatio || 1;
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            canvas.width = w * dpr; canvas.height = h * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, w, h);
+
+            let seed = 0;
+            for (const ch of d.sensorId) seed += ch.charCodeAt(0);
+            const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+
+            const base = parseFloat(d.metrics.stress);
+            const pts = Array.from({ length: 24 }, (_, i) => base * (0.82 + 0.18 * (i / 23)) + (rand() - 0.5) * base * 0.08);
+            const min = Math.min(...pts) * 0.95, max = Math.max(...pts) * 1.05;
+
+            const color = d.severity === 'critical' ? '#ef4444' : (d.severity === 'high' ? '#f59e0b' : '#eab308');
+
+            ctx.strokeStyle = 'rgba(148,163,184,0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 3; i++) {
+                const y = (h / 3) * i;
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+            }
+
+            const xy = pts.map((v, i) => [(i / 23) * w, h - ((v - min) / (max - min)) * (h - 6) - 3]);
+
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, color + '55');
+            grad.addColorStop(1, color + '00');
+            ctx.beginPath();
+            xy.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+            ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+            ctx.fillStyle = grad; ctx.fill();
+
+            ctx.beginPath();
+            xy.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+        }
+
+        /* =====================================================================
+           6. MONTHLY & YEARLY REPORTS
+        ===================================================================== */
+        const reportsData = {
+            monthly: {
+                label: 'October 2026',
+                epoxyLiters: 14.5,
+                entries: [
+                    { task: 'CFRP Column Jacketing (Pillar A2)', date: 'Oct 12, 2026', vendor: 'UltraTech Structural', status: 'completed', cost: 62000 },
+                    { task: 'Staircase Landing Dowel Anchoring', date: 'Oct 22, 2026', vendor: 'Structural Team B', status: 'in-progress', cost: 38000 },
+                    { task: 'Brick Arch Lintel Repointing (2nd Floor)', date: 'Oct 25, 2026', vendor: 'KIT Maintenance', status: 'completed', cost: 27000 },
+                    { task: 'Balcony Railing Anchor Corrosion Treatment', date: 'Nov 02, 2026', vendor: 'KIT Maintenance', status: 'scheduled', cost: 15000 }
+                ]
+            },
+            yearly: {
+                year: 2026,
+                integrityGain: 18,
+                healthDrop: 4.2,
+                budget: 875000,
+                months: [
+                    { m: 'Jan', found: 2, repaired: 2 }, { m: 'Feb', found: 3, repaired: 2 },
+                    { m: 'Mar', found: 2, repaired: 2 }, { m: 'Apr', found: 2, repaired: 2 },
+                    { m: 'May', found: 3, repaired: 3 }, { m: 'Jun', found: 2, repaired: 2 },
+                    { m: 'Jul', found: 3, repaired: 2 }, { m: 'Aug', found: 2, repaired: 2 },
+                    { m: 'Sep', found: 2, repaired: 1 }, { m: 'Oct', found: 2, repaired: 1 }
+                ],
+                note: 'Monsoon seepage at the plinth base reduced the structural health index by 4.2% in 2026. Carbon-fiber wrapping on Ground Floor columns stabilized load redistribution across Wings A and B.'
+            }
+        };
+
+        let activeReportTab = 'monthly';
+        const inr = n => '₹ ' + n.toLocaleString('en-IN');
+
+        const statusStyle = {
+            'completed': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            'in-progress': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+            'scheduled': 'bg-sky-500/20 text-sky-400 border-sky-500/30'
+        };
+
+        function statCard(label, value, color) {
+            return `
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[10px] uppercase font-mono text-slate-400">${label}</div>
+                    <div class="text-base font-bold ${color} mt-0.5">${value}</div>
+                </div>`;
+        }
+
+        function renderReport() {
+            const box = document.getElementById('report-content');
+            const mBtn = document.getElementById('tab-monthly-btn');
+            const yBtn = document.getElementById('tab-yearly-btn');
+            const on = 'flex-1 py-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold transition';
+            const off = 'flex-1 py-2 rounded-lg text-slate-400 hover:text-white font-semibold transition';
+            mBtn.className = activeReportTab === 'monthly' ? on : off;
+            yBtn.className = activeReportTab === 'yearly' ? on : off;
+
+            if (activeReportTab === 'monthly') {
+                const r = reportsData.monthly;
+                const total = r.entries.reduce((s, e) => s + e.cost, 0);
+                const done = r.entries.filter(e => e.status === 'completed').length;
+
+                box.innerHTML = `
+                    <div class="text-xs text-slate-400 font-mono">Month: <span class="text-amber-300">${r.label}</span></div>
+                    <div class="grid grid-cols-3 gap-3">
+                        ${statCard('Repairs', `${done}/${r.entries.length} Done`, 'text-emerald-400')}
+                        ${statCard('Epoxy Grout', `${r.epoxyLiters} L`, 'text-cyan-400')}
+                        ${statCard('Cost', inr(total), 'text-amber-400')}
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Repair Log</div>
+                        ${r.entries.map(e => `
+                            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 flex justify-between items-center gap-3">
+                                <div class="min-w-0">
+                                    <div class="text-xs font-semibold text-slate-200">${e.task}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">${e.date} · ${e.vendor} · ${inr(e.cost)}</div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] uppercase border shrink-0 ${statusStyle[e.status]}">${e.status.replace('-', ' ')}</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+            } else {
+                const r = reportsData.yearly;
+                const found = r.months.reduce((s, m) => s + m.found, 0);
+                const repaired = r.months.reduce((s, m) => s + m.repaired, 0);
+                const maxV = Math.max(...r.months.map(m => m.found));
+
+                box.innerHTML = `
+                    <div class="text-xs text-slate-400 font-mono">Year: <span class="text-amber-300">${r.year}</span></div>
+                    <div class="grid grid-cols-3 gap-3">
+                        ${statCard('Damage Found', `${found}`, 'text-rose-400')}
+                        ${statCard('Repaired', `${repaired}`, 'text-emerald-400')}
+                        ${statCard('Retrofit Budget', inr(r.budget), 'text-cyan-400')}
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Month-wise Damage vs Repair</div>
+                            <div class="flex items-center gap-3 text-[10px] text-slate-400">
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-rose-500"></span>Found</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-emerald-500"></span>Repaired</span>
+                            </div>
+                        </div>
+                        <div class="flex items-end gap-2 h-32">
+                            ${r.months.map(m => `
+                                <div class="flex-1 flex flex-col items-center gap-1">
+                                    <div class="flex items-end gap-0.5 h-24 w-full justify-center">
+                                        <div class="w-2.5 rounded-t bg-rose-500" style="height:${(m.found / maxV) * 100}%"></div>
+                                        <div class="w-2.5 rounded-t bg-emerald-500" style="height:${(m.repaired / maxV) * 100}%"></div>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-400">${m.m}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Annual Trend</div>
+                        <p class="text-xs text-slate-400 leading-relaxed">${r.note}</p>
+                        <div class="flex gap-4 text-[11px] font-mono pt-1">
+                            <span class="text-rose-400">Health index drop: -${r.healthDrop}%</span>
+                            <span class="text-emerald-400">Retrofit gain: +${r.integrityGain}%</span>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        function openReportsModal() { renderReport(); showModal('reports-modal'); }
+        function closeReportsModal() { hideModal('reports-modal'); }
+        function switchReportTab(tab) { activeReportTab = tab; renderReport(); }
+
+        // Real CSV download
+        function downloadReport() {
+            let csv = '';
+            let name = '';
+            if (activeReportTab === 'monthly') {
+                const r = reportsData.monthly;
+                name = `KIT-Hostel-Monthly-Report-${r.label.replace(' ', '-')}.csv`;
+                csv = 'Task,Date,Vendor,Status,Cost (INR)\n' +
+                    r.entries.map(e => `"${e.task}","${e.date}","${e.vendor}",${e.status},${e.cost}`).join('\n');
+            } else {
+                const r = reportsData.yearly;
+                name = `KIT-Hostel-Yearly-Report-${r.year}.csv`;
+                csv = 'Month,Damage Found,Repaired\n' + r.months.map(m => `${m.m},${m.found},${m.repaired}`).join('\n');
+            }
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('Report download ho gayi.', 'success');
+        }
+
+        /* =====================================================================
+           7. THREE.JS HOSTEL MODEL
+        ===================================================================== */
         let scene, camera, renderer, controls;
         let buildingGroup, brickGroup, columnsGroup, stairsGroup, lawnGroup, defectMarkersGroup;
         let currentRenderMode = 'solid';
-
         const materials = {};
 
         function initThree() {
             const container = document.getElementById('canvas-container');
             const width = container.clientWidth || window.innerWidth;
-            const height = container.clientHeight || (window.innerHeight - 64);
+            const height = container.clientHeight || (window.innerHeight - 56);
 
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x080c14);
@@ -743,9 +900,7 @@
                 console.warn("OrbitControls fallback mode active.");
             }
 
-            // Lighting
-            const ambient = new THREE.AmbientLight(0xffffff, 0.75);
-            scene.add(ambient);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.75));
 
             const sunLight = new THREE.DirectionalLight(0xffffff, 1.25);
             sunLight.position.set(40, 60, 30);
@@ -767,87 +922,41 @@
             lawnGroup = new THREE.Group();
             defectMarkersGroup = new THREE.Group();
 
-            buildingGroup.add(brickGroup);
-            buildingGroup.add(columnsGroup);
-            buildingGroup.add(stairsGroup);
-            buildingGroup.add(lawnGroup);
-            buildingGroup.add(defectMarkersGroup);
-
+            buildingGroup.add(brickGroup, columnsGroup, stairsGroup, lawnGroup, defectMarkersGroup);
             scene.add(buildingGroup);
 
             buildKITBoysHostelModel();
             createDefectVisualizers();
+
+            // Render modes ke liye har mesh ka original material yaad rakho
+            [brickGroup, columnsGroup, stairsGroup].forEach(g => g.traverse(c => {
+                if (c.isMesh) c.userData.defaultMaterial = c.material;
+            }));
 
             window.addEventListener('resize', onWindowResize);
             animate();
         }
 
         function initMaterials() {
-            // KIT Terracotta Red Brick Material
-            materials.redBrick = new THREE.MeshStandardMaterial({
-                color: 0x991b1b,
-                roughness: 0.75,
-                metalness: 0.1,
-                name: 'redBrick'
-            });
+            materials.redBrick = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.75, metalness: 0.1 });
+            materials.whiteConcrete = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.45, metalness: 0.1 });
+            materials.corridorWall = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+            materials.darkWindow = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, roughness: 0.1, transmission: 0.5, transparent: true, opacity: 0.85 });
+            materials.lawnGreen = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.9 });
+            materials.bushGreen = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.8 });
+            materials.pathwayGray = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 });
 
-            // Bright White Concrete Columns & Slabs
-            materials.whiteConcrete = new THREE.MeshStandardMaterial({
-                color: 0xf8fafc,
-                roughness: 0.45,
-                metalness: 0.1,
-                name: 'whiteConcrete'
-            });
-
-            // Dark Recessed Wall Behind Corridor
-            materials.corridorWall = new THREE.MeshStandardMaterial({
-                color: 0x1e293b,
-                roughness: 0.6
-            });
-
-            // Dark Glass Window Panes
-            materials.darkWindow = new THREE.MeshPhysicalMaterial({
-                color: 0x0f172a,
-                roughness: 0.1,
-                transmission: 0.5,
-                transparent: true,
-                opacity: 0.85
-            });
-
-            // Green Courtyard Lawn
-            materials.lawnGreen = new THREE.MeshStandardMaterial({
-                color: 0x15803d,
-                roughness: 0.9
-            });
-
-            // Garden Bush Foliage
-            materials.bushGreen = new THREE.MeshStandardMaterial({
-                color: 0x16a34a,
-                roughness: 0.8
-            });
-
-            // Paved Pathway
-            materials.pathwayGray = new THREE.MeshStandardMaterial({
-                color: 0x475569,
-                roughness: 0.8
-            });
-
-            // Special Modes
             materials.wireframe = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
             materials.xray = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, transparent: true, opacity: 0.3, roughness: 0.1 });
             materials.heatmap = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
         }
 
-        /* 
-           4. PROCEDURAL KIT HOSTEL ARCHITECTURE (3-STORY L-SHAPED BLOCK) */
         function buildKITBoysHostelModel() {
-            const stories = 3; // Ground + 1st + 2nd Floor
+            const stories = 3;
             const storyHeight = 4.2;
-            const wingWidth = 8.0;
 
-            // 1. COURTYARD LAWN & LANDSCAPING BASE
-            const lawnGeo = new THREE.PlaneGeometry(80, 80);
-            const lawnMesh = new THREE.Mesh(lawnGeo, materials.lawnGreen);
+            // Lawn
+            const lawnMesh = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), materials.lawnGreen);
             lawnMesh.rotation.x = -Math.PI / 2;
             lawnMesh.position.y = -0.05;
             lawnMesh.receiveShadow = true;
@@ -857,34 +966,24 @@
             gridHelper.position.y = 0.01;
             lawnGroup.add(gridHelper);
 
-            // Garden Bushes along Courtyard Edge
             for (let bx = -18; bx <= 18; bx += 3) {
-                const bushGeo = new THREE.SphereGeometry(0.7 + Math.random() * 0.3, 8, 8);
-                const bush = new THREE.Mesh(bushGeo, materials.bushGreen);
+                const bush = new THREE.Mesh(new THREE.SphereGeometry(0.7 + Math.random() * 0.3, 8, 8), materials.bushGreen);
                 bush.position.set(bx, 0.5, 4.5);
                 lawnGroup.add(bush);
             }
 
-            // 2. L-SHAPED HOSTEL BUILDING WINGS
-            // Wing A (Main Front Wing): X from -20 to 18, Z around -4
-            // Wing B (East Side Wing): Z from -4 to 22, X around 14
-
-            // Base Foundation Plinth Pad
-            const plinthGeoA = new THREE.BoxGeometry(39, 0.6, 9);
-            const plinthA = new THREE.Mesh(plinthGeoA, materials.whiteConcrete);
+            // Plinth
+            const plinthA = new THREE.Mesh(new THREE.BoxGeometry(39, 0.6, 9), materials.whiteConcrete);
             plinthA.position.set(-1, 0.3, -4);
             brickGroup.add(plinthA);
 
-            const plinthGeoB = new THREE.BoxGeometry(9, 0.6, 26);
-            const plinthB = new THREE.Mesh(plinthGeoB, materials.whiteConcrete);
+            const plinthB = new THREE.Mesh(new THREE.BoxGeometry(9, 0.6, 26), materials.whiteConcrete);
             plinthB.position.set(14, 0.3, 9.5);
             brickGroup.add(plinthB);
 
-            // CONSTRUCT 3 STORIES (Ground + Floor 1 + Floor 2)
             for (let s = 0; s < stories; s++) {
                 const floorY = s * storyHeight + 0.6;
 
-                // Thick White Concrete Floor Slabs & Balcony Trim Bands
                 const slabA = new THREE.Mesh(new THREE.BoxGeometry(40, 0.45, 9.5), materials.whiteConcrete);
                 slabA.position.set(-1, floorY + storyHeight, -4);
                 brickGroup.add(slabA);
@@ -893,52 +992,40 @@
                 slabB.position.set(14, floorY + storyHeight, 9.5);
                 brickGroup.add(slabB);
 
-                // Recessed Back Wall & Windows (Wing A)
                 const backWallA = new THREE.Mesh(new THREE.BoxGeometry(38, storyHeight, 0.3), materials.corridorWall);
                 backWallA.position.set(-1, floorY + storyHeight / 2, -7.8);
                 brickGroup.add(backWallA);
 
-                // Recessed Back Wall & Windows (Wing B)
                 const backWallB = new THREE.Mesh(new THREE.BoxGeometry(0.3, storyHeight, 25), materials.corridorWall);
                 backWallB.position.set(17.8, floorY + storyHeight / 2, 9.5);
                 brickGroup.add(backWallB);
 
-                // Windows & Doors along Wing A
                 for (let wx = -18; wx <= 14; wx += 4) {
-                    const winGeo = new THREE.BoxGeometry(1.8, 1.6, 0.1);
-                    const win = new THREE.Mesh(winGeo, materials.darkWindow);
+                    const win = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.6, 0.1), materials.darkWindow);
                     win.position.set(wx, floorY + storyHeight / 2 + 0.3, -7.6);
                     brickGroup.add(win);
                 }
 
-                // RED BRICK ARCH BAYS & WHITE CIRCULAR COLUMNS (WING A)
+                // Wing A
                 for (let bx = -18; bx <= 12; bx += 4) {
-                    // Left & Right Red Brick Piers
-                    const pierGeo = new THREE.BoxGeometry(0.7, storyHeight, 0.7);
-                    const pier = new THREE.Mesh(pierGeo, materials.redBrick);
+                    const pier = new THREE.Mesh(new THREE.BoxGeometry(0.7, storyHeight, 0.7), materials.redBrick);
                     pier.position.set(bx, floorY + storyHeight / 2, -0.6);
                     brickGroup.add(pier);
 
-                    // Red Brick Arch Lintel Top Piece
-                    const archLintelGeo = new THREE.BoxGeometry(3.4, 0.6, 0.7);
-                    const archLintel = new THREE.Mesh(archLintelGeo, materials.redBrick);
+                    const archLintel = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.6, 0.7), materials.redBrick);
                     archLintel.position.set(bx + 2.0, floorY + storyHeight - 0.3, -0.6);
                     brickGroup.add(archLintel);
 
-                    // White Circular Support Columns along Front Walkway
-                    const colGeo = new THREE.CylinderGeometry(0.22, 0.22, storyHeight - 0.4, 16);
-                    const col = new THREE.Mesh(colGeo, materials.whiteConcrete);
+                    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, storyHeight - 0.4, 16), materials.whiteConcrete);
                     col.position.set(bx + 2.0, floorY + (storyHeight - 0.4) / 2, -0.1);
                     columnsGroup.add(col);
 
-                    // Balcony Handrail Line
-                    const railGeo = new THREE.BoxGeometry(3.3, 0.1, 0.08);
-                    const rail = new THREE.Mesh(railGeo, materials.whiteConcrete);
+                    const rail = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.1, 0.08), materials.whiteConcrete);
                     rail.position.set(bx + 2.0, floorY + 1.1, -0.1);
                     columnsGroup.add(rail);
                 }
 
-                // RED BRICK ARCH BAYS & WHITE CIRCULAR COLUMNS (WING B - EAST WING)
+                // Wing B
                 for (let bz = 0; bz <= 20; bz += 4) {
                     const pier = new THREE.Mesh(new THREE.BoxGeometry(0.7, storyHeight, 0.7), materials.redBrick);
                     pier.position.set(9.6, floorY + storyHeight / 2, bz);
@@ -954,27 +1041,20 @@
                 }
             }
 
-            // 3. INNER CORNER EXTERNAL ZIG-ZAG WHITE STAIRCASE
-            // Located at the inner corner junction (around X: 5.5, Z: -3.2)
-            const stairX = 5.5;
-            const stairZ = -3.2;
-
+            // Corner zig-zag staircase
+            const stairX = 5.5, stairZ = -3.2;
             for (let s = 0; s < stories; s++) {
                 const landingY = s * storyHeight + 0.6;
 
-                // Horizontal Stair Landing Pad
                 const landing = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.3, 3.5), materials.whiteConcrete);
                 landing.position.set(stairX, landingY, stairZ);
                 stairsGroup.add(landing);
 
-                // Diagonal Flight Staircase Beam (Zig-Zag Flight)
-                const flightGeo = new THREE.BoxGeometry(1.2, 0.3, 4.8);
-                const flight = new THREE.Mesh(flightGeo, materials.whiteConcrete);
+                const flight = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 4.8), materials.whiteConcrete);
                 flight.position.set(stairX + (s % 2 === 0 ? 0.8 : -0.8), landingY + storyHeight / 2, stairZ + 1.2);
-                flight.rotation.x = 0.55; // Diagonal slope
+                flight.rotation.x = 0.55;
                 stairsGroup.add(flight);
 
-                // Vertical White Support Columns for Stair Shaft
                 const stairColA = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, storyHeight, 16), materials.whiteConcrete);
                 stairColA.position.set(stairX - 1.5, landingY + storyHeight / 2, stairZ - 1.5);
                 stairsGroup.add(stairColA);
@@ -985,17 +1065,11 @@
             }
         }
 
-        /* 
-           5. 3D DEFECT ANOMALY MARKERS & RADAR PULSES
-          */
         function createDefectVisualizers() {
             defectsData.forEach(defect => {
                 const { x, y, z } = defect.position;
-                const isCritical = defect.severity === 'critical';
-                const isHigh = defect.severity === 'high';
-                const colorHex = isCritical ? 0xef4444 : (isHigh ? 0xf59e0b : 0xeab308);
+                const colorHex = defect.severity === 'critical' ? 0xef4444 : (defect.severity === 'high' ? 0xf59e0b : 0xeab308);
 
-                // Glowing Center Orb
                 const orb = new THREE.Mesh(
                     new THREE.SphereGeometry(0.7, 16, 16),
                     new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.95 })
@@ -1003,7 +1077,6 @@
                 orb.position.set(x, y, z);
                 defectMarkersGroup.add(orb);
 
-                // Radar Pulsing Wireframe Ring
                 const ring = new THREE.Mesh(
                     new THREE.RingGeometry(0.9, 1.4, 24),
                     new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.8 })
@@ -1013,103 +1086,85 @@
                 ring.userData = { isPulse: true };
                 defectMarkersGroup.add(ring);
 
-                // Emissive Point Light
                 const pLight = new THREE.PointLight(colorHex, 2.5, 10);
                 pLight.position.set(x, y, z);
                 defectMarkersGroup.add(pLight);
             });
         }
 
-        /* 
-           6. DYNAMIC 2D-TO-3D SVG CALLOUT OVERLAY ARROWS */
+        /* =====================================================================
+           8. CALLOUT LINE (sirf selected defect ke liye, taaki UI saaf rahe)
+        ===================================================================== */
         function updateSVGCallouts() {
             const svg = document.getElementById('callout-svg');
             svg.innerHTML = '';
+            if (!selectedDefect || !camera) return;
+            if (currentFilter !== 'all' && selectedDefect.severity !== currentFilter) return;
 
             const container = document.getElementById('canvas-container');
-            if (!container || !camera) return;
             const width = container.clientWidth || window.innerWidth;
-            const height = container.clientHeight || (window.innerHeight - 64);
+            const height = container.clientHeight || (window.innerHeight - 56);
 
-            defectsData.forEach(defect => {
-                if (currentFilter !== 'all' && defect.severity !== currentFilter) return;
+            const p = selectedDefect.position;
+            const projected = new THREE.Vector3(p.x, p.y, p.z).project(camera);
+            if (projected.z > 1) return;
 
-                const worldPos = new THREE.Vector3(defect.position.x, defect.position.y, defect.position.z);
-                const projected = worldPos.clone().project(camera);
+            const targetX = (projected.x * 0.5 + 0.5) * width;
+            const targetY = (-(projected.y * 0.5) + 0.5) * height;
 
-                if (projected.z > 1) return;
+            const cardEl = document.getElementById(`card-${selectedDefect.id}`);
+            if (!cardEl) return;
+            const rect = cardEl.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
 
-                const targetX = (projected.x * 0.5 + 0.5) * width;
-                const targetY = (-(projected.y * 0.5) + 0.5) * height;
+            const sourceX = rect.left - containerRect.left;
+            const sourceY = rect.top + (rect.height / 2) - containerRect.top;
+            const dx = Math.abs(sourceX - targetX) * 0.45;
+            const strokeColor = selectedDefect.severity === 'critical' ? '#ef4444' : (selectedDefect.severity === 'high' ? '#f59e0b' : '#eab308');
 
-                const cardEl = document.getElementById(`card-${defect.id}`);
-                if (!cardEl) return;
-                const rect = cardEl.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', `M ${targetX} ${targetY} C ${targetX + dx} ${targetY}, ${sourceX - dx} ${sourceY}, ${sourceX} ${sourceY}`);
+            path.setAttribute('stroke', strokeColor);
+            path.setAttribute('stroke-width', '2');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke-dasharray', '5 4');
+            svg.appendChild(path);
 
-                const sourceX = rect.left - containerRect.left;
-                const sourceY = rect.top + (rect.height / 2) - containerRect.top;
-
-                const dx = Math.abs(sourceX - targetX) * 0.45;
-                const strokeColor = defect.severity === 'critical' ? '#ef4444' : (defect.severity === 'high' ? '#f59e0b' : '#eab308');
-
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', `M ${targetX} ${targetY} C ${targetX + dx} ${targetY}, ${sourceX - dx} ${sourceY}, ${sourceX} ${sourceY}`);
-                path.setAttribute('stroke', strokeColor);
-                path.setAttribute('stroke-width', '2.5');
-                path.setAttribute('fill', 'none');
-                path.setAttribute('stroke-dasharray', '5 4');
-                svg.appendChild(path);
-
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', targetX);
-                circle.setAttribute('cy', targetY);
-                circle.setAttribute('r', '6');
-                circle.setAttribute('fill', strokeColor);
-                svg.appendChild(circle);
-            });
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', targetX);
+            circle.setAttribute('cy', targetY);
+            circle.setAttribute('r', '5');
+            circle.setAttribute('fill', strokeColor);
+            svg.appendChild(circle);
         }
 
-        /* 
-           7. CAMERA PRESETS & RENDER MODES */
+        /* =====================================================================
+           9. CAMERA & RENDER MODES
+        ===================================================================== */
         function setCameraPreset(preset) {
-            let targetPos = new THREE.Vector3();
-            let targetLook = new THREE.Vector3(0, 7, 0);
-
+            const targetPos = new THREE.Vector3();
+            const targetLook = new THREE.Vector3(0, 7, 0);
             switch (preset) {
-                case 'iso':
-                    targetPos.set(38, 26, 42);
-                    break;
-                case 'front':
-                    targetPos.set(-2, 10, 36);
-                    break;
-                case 'staircase':
-                    targetPos.set(16, 12, 14);
-                    targetLook.set(5.5, 5.2, -3.2);
-                    break;
-                case 'top':
-                    targetPos.set(0, 65, 0.1);
-                    break;
+                case 'iso': targetPos.set(38, 26, 42); break;
+                case 'front': targetPos.set(-2, 10, 36); break;
+                case 'staircase': targetPos.set(16, 12, 14); targetLook.set(5.5, 5.2, -3.2); break;
+                case 'top': targetPos.set(0, 65, 0.1); break;
             }
-
             animateCameraTo(targetPos, targetLook);
         }
 
-        function resetCameraView() {
-            setCameraPreset('iso');
-        }
-
+        let camAnimId = 0;
         function animateCameraTo(targetPos, targetLookAt) {
+            const myId = ++camAnimId;   // purani animation cancel
             let step = 0;
-            function animateCam() {
-                if (step < 25) {
-                    camera.position.lerp(targetPos, 0.12);
-                    if (controls) controls.target.lerp(targetLookAt, 0.12);
-                    step++;
-                    requestAnimationFrame(animateCam);
-                }
+            function tick() {
+                if (myId !== camAnimId || step >= 30) return;
+                camera.position.lerp(targetPos, 0.12);
+                if (controls) controls.target.lerp(targetLookAt, 0.12);
+                step++;
+                requestAnimationFrame(tick);
             }
-            animateCam();
+            tick();
         }
 
         function focusOnDefect(id) {
@@ -1117,9 +1172,10 @@
             if (!defect) return;
             selectedDefect = defect;
 
-            const targetPos = new THREE.Vector3(defect.position.x + 10, defect.position.y + 4, defect.position.z + 10);
-            const targetLook = new THREE.Vector3(defect.position.x, defect.position.y, defect.position.z);
-            animateCameraTo(targetPos, targetLook);
+            animateCameraTo(
+                new THREE.Vector3(defect.position.x + 10, defect.position.y + 4, defect.position.z + 10),
+                new THREE.Vector3(defect.position.x, defect.position.y, defect.position.z)
+            );
 
             document.querySelectorAll('.defect-card').forEach(c => c.classList.remove('active'));
             const activeCard = document.getElementById(`card-${id}`);
@@ -1129,17 +1185,18 @@
         function setRenderMode(mode) {
             currentRenderMode = mode;
             document.querySelectorAll('.mode-btn').forEach(b => {
-                b.className = "mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2";
+                b.className = "mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition";
             });
-            document.getElementById(`btn-mode-${mode}`).className = "mode-btn px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium border border-blue-500 transition text-left flex items-center gap-2 shadow-sm";
+            document.getElementById(`btn-mode-${mode}`).className = "mode-btn px-2.5 py-1.5 rounded-lg bg-blue-600 text-white text-[11px] font-medium border border-blue-500 transition";
 
-            brickGroup.traverse(child => {
-                if (child.isMesh) {
+            [brickGroup, columnsGroup, stairsGroup].forEach(group => {
+                group.traverse(child => {
+                    if (!child.isMesh) return;
                     if (mode === 'wireframe') child.material = materials.wireframe;
                     else if (mode === 'xray') child.material = materials.xray;
                     else if (mode === 'heatmap') child.material = materials.heatmap;
                     else child.material = child.userData.defaultMaterial || materials.redBrick;
-                }
+                });
             });
         }
 
@@ -1150,95 +1207,59 @@
             if (layer === 'lawn') lawnGroup.visible = isVisible;
         }
 
-        /* 
-           8. PYTHON AI BACKEND INTEGRATION & MODAL */
-        function runAIAgentScan() {
-    showToast("Running LangGraph Multi-Agent Structural Scan...", "info");
+        /* =====================================================================
+           10. ANIMATION LOOP
+        ===================================================================== */
+        let lastFrame = performance.now(), frames = 0, lastFpsUpdate = performance.now();
 
-    setTimeout(() => {
-        // 1. Filter critical defects
-        const criticalDefects = defectsData.filter(d => d.severity === 'critical');
-        
-        if (criticalDefects.length > 0) {
-            showToast(`🚨 AI AGENT DETECTED ${criticalDefects.length} CRITICAL ANOMALIES!`, "error");
-            
-            // 2. AUTOMATICALLY DISPATCH ALERTS TO ALL SELECTED AUTHORITIES
-            autoDispatchEmergencyAlerts(criticalDefects);
-        } else {
-            showToast("AI Agent Scan Complete: Structural health parameters normal.", "success");
-        }
-    }, 1800);
-}
-
-// AUTOMATIC WHATSAPP & SMS ALERT DISPATCH ENGINE
-function autoDispatchEmergencyAlerts(criticalDefects) {
-    const selectedAuthorities = authoritiesData.filter(a => a.selected);
-    
-    if (selectedAuthorities.length === 0) {
-        showToast("No authority selected for automatic dispatch.", "error");
-        return;
-    }
-
-    showToast(`⚡ AUTOMATIC DISPATCH: Sending Alerts to ${selectedAuthorities.length} Authorities...`, "error");
-
-    selectedAuthorities.forEach((auth, index) => {
-        setTimeout(() => {
-            const alertText = encodeURIComponent(
-                `🚨 *AUTOMATIC EMERGENCY ALERT - SEISMOKAVACH AI*\n\n` +
-                `Critical Anomaly Auto-Detected at *KIT BOYS HOSTEL*!\n` +
-                `Building Health: *84% (HIGH RISK)*\n\n` +
-                `*Primary Severe Anomaly:*\n` +
-                `• Location: ${criticalDefects[0].title}\n` +
-                `• Sensor Tag: ${criticalDefects[0].sensorId}\n` +
-                `• Measured Stress: ${criticalDefects[0].metrics.stress}\n\n` +
-                `*AI Recommended Remediation:*\n` +
-                `${criticalDefects[0].action}\n\n` +
-                `_Automated Alert sent directly by Seismokavach Structural Engine._`
-            );
-
-            // Automatically open WhatsApp API window for instant dispatch
-            window.open(`https://api.whatsapp.com/send?phone=${auth.rawPhone}&text=${alertText}`, '_blank');
-            
-            showToast(`Auto-alert dispatched to ${auth.name} (${auth.role})!`, 'success');
-        }, index * 800);
-    });
-}
-
-        /*           9. MAIN ANIMATION LOOP        */
         function animate() {
             requestAnimationFrame(animate);
 
-            if (defectMarkersGroup) {
-                defectMarkersGroup.children.forEach(child => {
-                    if (child.userData && child.userData.isPulse) {
-                        child.scale.x += 0.008;
-                        child.scale.y += 0.008;
-                        if (child.scale.x > 1.8) child.scale.set(1, 1, 1);
-                    }
-                });
-            }
+            defectMarkersGroup.children.forEach(child => {
+                if (child.userData && child.userData.isPulse) {
+                    child.scale.x += 0.008;
+                    child.scale.y += 0.008;
+                    if (child.scale.x > 1.8) child.scale.set(1, 1, 1);
+                }
+            });
 
             if (controls) controls.update();
             updateSVGCallouts();
             renderer.render(scene, camera);
+
+            // FPS + camera distance
+            frames++;
+            const now = performance.now();
+            if (now - lastFpsUpdate >= 1000) {
+                document.getElementById('fps-counter').textContent = frames;
+                frames = 0;
+                lastFpsUpdate = now;
+                const t = controls ? controls.target : new THREE.Vector3(0, 7, 0);
+                document.getElementById('cam-dist').textContent = Math.round(camera.position.distanceTo(t)) + 'm';
+            }
         }
 
         function onWindowResize() {
             const container = document.getElementById('canvas-container');
             if (!container || !renderer || !camera) return;
             const width = container.clientWidth || window.innerWidth;
-            const height = container.clientHeight || (window.innerHeight - 64);
+            const height = container.clientHeight || (window.innerHeight - 56);
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
             renderer.setSize(width, height);
         }
 
-        // DOM Load Initializer
+        /* =====================================================================
+           11. START
+        ===================================================================== */
         window.addEventListener('load', () => {
             renderAuthoritiesList();
-            renderWeakSpotsList();
+            updateHeaderBadge();
             initThree();
             focusOnDefect(defectsData[0].id);
+            renderWeakSpotsList();
+            focusOnDefect(defectsData[0].id);   // list render hone ke baad card highlight
+            startAutoMonitor();                 // <-- automatic alert yahin se shuru hota hai
         });
     </script>
 </body>
