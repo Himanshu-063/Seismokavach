@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismokavach</title>
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js v0.128.0 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-       <style>
+
+    <style>
         body {
             font-family: 'Inter', sans-serif;
             overflow: hidden;
@@ -35,6 +41,7 @@
             background: #475569;
         }
 
+        /* Glassmorphism Panel Styling */
         .glass-panel {
             background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(16px);
@@ -99,6 +106,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Header Actions & AI Agent Button -->
         <div class="flex items-center space-x-2.5">
             <button onclick="runAIAgentScan()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-medium flex items-center space-x-2 shadow-lg shadow-cyan-950/50 transition border border-cyan-400/30">
                 <i class="fa-solid fa-brain text-cyan-200"></i>
@@ -114,6 +123,7 @@
             </button>
         </div>
     </header>
+
     <!-- MAIN DASHBOARD CONTENT AREA -->
     <div class="relative flex-1 flex flex-col md:flex-row overflow-hidden">
 
@@ -133,6 +143,7 @@
                 <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
                     Select recipients to dispatch instant structural risk breakdown alerts to their mobile phones.
                 </p>
+
                 <!-- Authority Recipient Cards -->
                 <div class="space-y-2.5" id="authorities-container">
                     <!-- Populated dynamically via JS -->
@@ -149,6 +160,7 @@
                     </button>
                 </div>
             </div>
+
             <!-- 2. RENDER VIEW MODES -->
             <div class="p-4 border-b border-slate-800">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">3D Rendering Mode</h2>
@@ -166,7 +178,8 @@
                         <i class="fa-solid fa-fire text-xs"></i> Stress Heatmap
                     </button>
                 </div>
-            </div
+            </div>
+
             <!-- 3. HOSTEL STRUCTURE LAYER TOGGLES -->
             <div class="p-4 border-b border-slate-800">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Hostel Components</h2>
@@ -189,6 +202,7 @@
                     </label>
                 </div>
             </div>
+
             <!-- 4. CAMERA VIEW PRESETS -->
             <div class="p-4">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Camera Views</h2>
@@ -200,6 +214,7 @@
                 </div>
             </div>
         </aside>
+
         <!-- 3D VIEWPORT CANVAS AREA -->
         <div class="relative flex-1 bg-slate-950 overflow-hidden min-h-[450px]">
             <!-- WebGL Canvas Container -->
@@ -270,6 +285,9 @@
 
     </div>
 
+    
+    
+    
     <!-- DEEP DIAGNOSTIC INSPECTION MODAL -->
     <div id="detail-modal" class="hidden fixed inset-0 z-50 glass-panel bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col">
@@ -297,7 +315,8 @@
                             <span class="absolute bottom-2 left-2 text-[10px] font-mono bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">CAM #KIT-HOSTEL-02</span>
                         </div>
                     </div>
- <!-- 24hr Telemetry Chart -->
+
+                    <!-- 24hr Telemetry Chart -->
                     <div class="space-y-1">
                         <div class="flex items-center justify-between text-[10px] font-bold uppercase font-mono text-slate-400">
                             <span>24hr Strain Sensor Curve</span>
@@ -353,12 +372,36 @@
         const authoritiesData = [
             {
                 id: 'auth-1',
-                name: 'Himanshu kumar',
+                name: 'Nandini Mishra',
                 role: 'Hostel Chief Warden',
-                phone: '+91 6393670469',
-                rawPhone: '916393670469',
+                phone: '+91 98390 12345',
+                rawPhone: '919839012345',
                 selected: true
             },
+            {
+                id: 'auth-2',
+                name: 'Dr. Elena Vance',
+                role: 'Lead Structural Engineer',
+                phone: '+91 94150 67890',
+                rawPhone: '919415067890',
+                selected: true
+            },
+            {
+                id: 'auth-3',
+                name: 'Prof. A.K. Roy',
+                role: 'Campus Director',
+                phone: '+91 99350 11223',
+                rawPhone: '919935011223',
+                selected: true
+            },
+            {
+                id: 'auth-4',
+                name: 'Sarah Lin',
+                role: 'Site Safety Officer',
+                phone: '+91 91250 44556',
+                rawPhone: '919125044556',
+                selected: true
+            }
         ];
 
         function renderAuthoritiesList() {
@@ -401,7 +444,7 @@
 
         function generateBuildingSummaryReport() {
             return encodeURIComponent(
-                `🚨 *STRUCTURAL ALERT - Seismokavach*\n` +
+                `🚨 *STRUCTURAL ALERT - KIT BOYS HOSTEL*\n` +
                 `Building Health Index: *84% (MODERATE RISK)*\n` +
                 `Active Defects: 5 Total (2 CRITICAL)\n\n` +
                 `*Critical Issues Highlighted:*\n` +
@@ -464,7 +507,7 @@
             }, 4000);
         }
 
-/* =========================================================================
+        /* =========================================================================
            2. KIT BOYS HOSTEL DEFECT ANOMALIES DATA
            ========================================================================= */
         const defectsData = [
@@ -570,7 +613,8 @@
             if (activeBtn) activeBtn.className = "filter-tab flex-1 py-1 rounded-md bg-blue-600 text-white font-medium transition";
             renderWeakSpotsList();
         }
-/* =========================================================================
+
+        /* =========================================================================
            3. THREE.JS PROCEDURAL KIT BOYS HOSTEL MODEL
            ========================================================================= */
         let scene, camera, renderer, controls;
@@ -729,7 +773,6 @@
             const gridHelper = new THREE.GridHelper(80, 20, 0x10b981, 0x1e293b);
             gridHelper.position.y = 0.01;
             lawnGroup.add(gridHelper);
-        }
 
             // Garden Bushes along Courtyard Edge
             for (let bx = -18; bx <= 18; bx += 3) {
@@ -828,7 +871,7 @@
                 }
             }
 
-             // 3. INNER CORNER EXTERNAL ZIG-ZAG WHITE STAIRCASE
+            // 3. INNER CORNER EXTERNAL ZIG-ZAG WHITE STAIRCASE
             // Located at the inner corner junction (around X: 5.5, Z: -3.2)
             const stairX = 5.5;
             const stairZ = -3.2;
@@ -857,6 +900,8 @@
                 stairColB.position.set(stairX + 1.5, landingY + storyHeight / 2, stairZ - 1.5);
                 stairsGroup.add(stairColB);
             }
+        }
+
         /* =========================================================================
            5. 3D DEFECT ANOMALY MARKERS & RADAR PULSES
            ========================================================================= */
@@ -942,7 +987,8 @@
                 svg.appendChild(circle);
             });
         }
-         /* =========================================================================
+
+        /* =========================================================================
            7. CAMERA PRESETS & RENDER MODES
            ========================================================================= */
         function setCameraPreset(preset) {
@@ -1022,7 +1068,8 @@
             if (layer === 'stairs') stairsGroup.visible = isVisible;
             if (layer === 'lawn') lawnGroup.visible = isVisible;
         }
-/* =========================================================================
+
+        /* =========================================================================
            8. PYTHON AI BACKEND INTEGRATION & MODAL
            ========================================================================= */
         async function runAIAgentScan() {
@@ -1137,7 +1184,8 @@
             window.open(`sms:?body=${text}`, '_blank');
             showToast('Defect report sent via SMS', 'info');
         }
-/* =========================================================================
+
+        /* =========================================================================
            9. MAIN ANIMATION LOOP
            ========================================================================= */
         function animate() {
