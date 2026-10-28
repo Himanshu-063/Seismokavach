@@ -570,3 +570,142 @@
             if (activeBtn) activeBtn.className = "filter-tab flex-1 py-1 rounded-md bg-blue-600 text-white font-medium transition";
             renderWeakSpotsList();
         }
+/* =========================================================================
+           3. THREE.JS PROCEDURAL KIT BOYS HOSTEL MODEL
+           ========================================================================= */
+        let scene, camera, renderer, controls;
+        let buildingGroup, brickGroup, columnsGroup, stairsGroup, lawnGroup, defectMarkersGroup;
+        let currentRenderMode = 'solid';
+
+        const materials = {};
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || (window.innerHeight - 64);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x080c14);
+            scene.fog = new THREE.FogExp2(0x080c14, 0.012);
+
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(38, 26, 42);
+
+            try {
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+            } catch (err) {
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            }
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            try {
+                const OrbitClass = THREE.OrbitControls || window.OrbitControls;
+                if (OrbitClass) {
+                    controls = new OrbitClass(camera, renderer.domElement);
+                    controls.enableDamping = true;
+                    controls.dampingFactor = 0.05;
+                    controls.maxPolarAngle = Math.PI / 2 - 0.02;
+                    controls.target.set(0, 7, 0);
+                }
+            } catch (err) {
+                console.warn("OrbitControls fallback mode active.");
+            }
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.75);
+            scene.add(ambient);
+
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.25);
+            sunLight.position.set(40, 60, 30);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
+
+            const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.6);
+            rimLight.position.set(-30, 20, -30);
+            scene.add(rimLight);
+
+            initMaterials();
+
+            buildingGroup = new THREE.Group();
+            brickGroup = new THREE.Group();
+            columnsGroup = new THREE.Group();
+            stairsGroup = new THREE.Group();
+            lawnGroup = new THREE.Group();
+            defectMarkersGroup = new THREE.Group();
+
+            buildingGroup.add(brickGroup);
+            buildingGroup.add(columnsGroup);
+            buildingGroup.add(stairsGroup);
+            buildingGroup.add(lawnGroup);
+            buildingGroup.add(defectMarkersGroup);
+
+            scene.add(buildingGroup);
+
+            buildKITBoysHostelModel();
+            createDefectVisualizers();
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function initMaterials() {
+            // KIT Terracotta Red Brick Material
+            materials.redBrick = new THREE.MeshStandardMaterial({
+                color: 0x991b1b,
+                roughness: 0.75,
+                metalness: 0.1,
+                name: 'redBrick'
+            });
+
+            // Bright White Concrete Columns & Slabs
+            materials.whiteConcrete = new THREE.MeshStandardMaterial({
+                color: 0xf8fafc,
+                roughness: 0.45,
+                metalness: 0.1,
+                name: 'whiteConcrete'
+            });
+
+            // Dark Recessed Wall Behind Corridor
+            materials.corridorWall = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                roughness: 0.6
+            });
+
+            // Dark Glass Window Panes
+            materials.darkWindow = new THREE.MeshPhysicalMaterial({
+                color: 0x0f172a,
+                roughness: 0.1,
+                transmission: 0.5,
+                transparent: true,
+                opacity: 0.85
+            });
+
+            // Green Courtyard Lawn
+            materials.lawnGreen = new THREE.MeshStandardMaterial({
+                color: 0x15803d,
+                roughness: 0.9
+            });
+
+            // Garden Bush Foliage
+            materials.bushGreen = new THREE.MeshStandardMaterial({
+                color: 0x16a34a,
+                roughness: 0.8
+            });
+
+            // Paved Pathway
+            materials.pathwayGray = new THREE.MeshStandardMaterial({
+                color: 0x475569,
+                roughness: 0.8
+            });
+
+            // Special Modes
+            materials.wireframe = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
+            materials.xray = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, transparent: true, opacity: 0.3, roughness: 0.1 });
+            materials.heatmap = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
+        }
