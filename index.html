@@ -1137,3 +1137,44 @@
             window.open(`sms:?body=${text}`, '_blank');
             showToast('Defect report sent via SMS', 'info');
         }
+/* =========================================================================
+           9. MAIN ANIMATION LOOP
+           ========================================================================= */
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (defectMarkersGroup) {
+                defectMarkersGroup.children.forEach(child => {
+                    if (child.userData && child.userData.isPulse) {
+                        child.scale.x += 0.008;
+                        child.scale.y += 0.008;
+                        if (child.scale.x > 1.8) child.scale.set(1, 1, 1);
+                    }
+                });
+            }
+
+            if (controls) controls.update();
+            updateSVGCallouts();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            if (!container || !renderer || !camera) return;
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || (window.innerHeight - 64);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        // DOM Load Initializer
+        window.addEventListener('load', () => {
+            renderAuthoritiesList();
+            renderWeakSpotsList();
+            initThree();
+            focusOnDefect(defectsData[0].id);
+        });
+    </script>
+</body>
+</html>
