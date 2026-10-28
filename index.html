@@ -366,43 +366,17 @@
 
     <!-- JAVASCRIPT LOGIC & THREE.JS ENGINE -->
     <script>
-        /* =========================================================================
-           1. HOSTEL AUTHORITIES DATA & ALERT DISPATCH SYSTEM
-           ========================================================================= */
+        /*           1. HOSTEL AUTHORITIES DATA & ALERT DISPATCH SYSTEM         */
         const authoritiesData = [
             {
                 id: 'auth-1',
-                name: 'Nandini Mishra',
+                name: 'Himanshu Kumar',
                 role: 'Hostel Chief Warden',
-                phone: '+91 98390 12345',
-                rawPhone: '919839012345',
+                phone: '+91 6393670469',
+                rawPhone: '916393670469',
                 selected: true
-            },
-            {
-                id: 'auth-2',
-                name: 'Dr. Elena Vance',
-                role: 'Lead Structural Engineer',
-                phone: '+91 94150 67890',
-                rawPhone: '919415067890',
-                selected: true
-            },
-            {
-                id: 'auth-3',
-                name: 'Prof. A.K. Roy',
-                role: 'Campus Director',
-                phone: '+91 99350 11223',
-                rawPhone: '919935011223',
-                selected: true
-            },
-            {
-                id: 'auth-4',
-                name: 'Sarah Lin',
-                role: 'Site Safety Officer',
-                phone: '+91 91250 44556',
-                rawPhone: '919125044556',
-                selected: true
-            }
-        ];
+            }, 
+            ];
 
         function renderAuthoritiesList() {
             const container = document.getElementById('authorities-container');
@@ -507,9 +481,7 @@
             }, 4000);
         }
 
-        /* =========================================================================
-           2. KIT BOYS HOSTEL DEFECT ANOMALIES DATA
-           ========================================================================= */
+        /*            2. KIT BOYS HOSTEL DEFECT ANOMALIES DATA      */
         const defectsData = [
             {
                 id: 'defect-1',
@@ -614,9 +586,8 @@
             renderWeakSpotsList();
         }
 
-        /* =========================================================================
-           3. THREE.JS PROCEDURAL KIT BOYS HOSTEL MODEL
-           ========================================================================= */
+        /* 
+           3. THREE.JS PROCEDURAL KIT BOYS HOSTEL MODEL */
         let scene, camera, renderer, controls;
         let buildingGroup, brickGroup, columnsGroup, stairsGroup, lawnGroup, defectMarkersGroup;
         let currentRenderMode = 'solid';
@@ -754,9 +725,8 @@
             materials.heatmap = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
         }
 
-        /* =========================================================================
-           4. PROCEDURAL KIT HOSTEL ARCHITECTURE (3-STORY L-SHAPED BLOCK)
-           ========================================================================= */
+        /* 
+           4. PROCEDURAL KIT HOSTEL ARCHITECTURE (3-STORY L-SHAPED BLOCK) */
         function buildKITBoysHostelModel() {
             const stories = 3; // Ground + 1st + 2nd Floor
             const storyHeight = 4.2;
@@ -902,9 +872,9 @@
             }
         }
 
-        /* =========================================================================
+        /* 
            5. 3D DEFECT ANOMALY MARKERS & RADAR PULSES
-           ========================================================================= */
+          */
         function createDefectVisualizers() {
             defectsData.forEach(defect => {
                 const { x, y, z } = defect.position;
@@ -937,9 +907,8 @@
             });
         }
 
-        /* =========================================================================
-           6. DYNAMIC 2D-TO-3D SVG CALLOUT OVERLAY ARROWS
-           ========================================================================= */
+        /* 
+           6. DYNAMIC 2D-TO-3D SVG CALLOUT OVERLAY ARROWS */
         function updateSVGCallouts() {
             const svg = document.getElementById('callout-svg');
             svg.innerHTML = '';
@@ -988,9 +957,8 @@
             });
         }
 
-        /* =========================================================================
-           7. CAMERA PRESETS & RENDER MODES
-           ========================================================================= */
+        /* 
+           7. CAMERA PRESETS & RENDER MODES */
         function setCameraPreset(preset) {
             let targetPos = new THREE.Vector3();
             let targetLook = new THREE.Vector3(0, 7, 0);
@@ -1069,9 +1037,8 @@
             if (layer === 'lawn') lawnGroup.visible = isVisible;
         }
 
-        /* =========================================================================
-           8. PYTHON AI BACKEND INTEGRATION & MODAL
-           ========================================================================= */
+        /* 
+           8. PYTHON AI BACKEND INTEGRATION & MODAL */
         async function runAIAgentScan() {
             showToast("Connecting to Python Multi-Agent AI Engine (Port 8000)...", "info");
 
@@ -1185,9 +1152,7 @@
             showToast('Defect report sent via SMS', 'info');
         }
 
-        /* =========================================================================
-           9. MAIN ANIMATION LOOP
-           ========================================================================= */
+        /*           9. MAIN ANIMATION LOOP        */
         function animate() {
             requestAnimationFrame(animate);
 
