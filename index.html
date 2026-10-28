@@ -464,4 +464,109 @@
             }, 4000);
         }
 
+/* =========================================================================
+           2. KIT BOYS HOSTEL DEFECT ANOMALIES DATA
+           ========================================================================= */
+        const defectsData = [
+            {
+                id: 'defect-1',
+                title: 'GF Corridor Pillar A2 - Vertical Compression Crack',
+                severity: 'critical',
+                position: { x: -10.0, y: 2.2, z: -2.8 },
+                photo: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=600&q=80',
+                sensorId: 'KIT-G-P2',
+                metrics: { stress: '44.2 MPa', safetyFactor: '1.12', crackWidth: '4.8 mm' },
+                action: 'Install temporary hydraulic shoring props. Wrap damaged column with carbon fiber jacket (CFRP) and inject low-viscosity structural epoxy resin.'
+            },
+            {
+                id: 'defect-2',
+                title: 'Corner Staircase Joint - Flight Shear Displacement',
+                severity: 'critical',
+                position: { x: 5.5, y: 5.2, z: -3.2 },
+                photo: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=600&q=80',
+                sensorId: 'KIT-STR-L1',
+                metrics: { stress: '51.8 MPa', safetyFactor: '1.08', displacement: '14.2 mm' },
+                action: 'Anchor stainless steel dowel plates at landing beam connection. Restrict heavy student traffic on inner corner staircase.'
+            },
+            {
+                id: 'defect-3',
+                title: '2nd Floor Brick Arch Lintels - Masonry Spalling',
+                severity: 'high',
+                position: { x: -14.0, y: 12.0, z: -2.8 },
+                photo: 'https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=600&q=80',
+                sensorId: 'KIT-L2-ARCH',
+                metrics: { stress: '32.5 MPa', safetyFactor: '1.35', mortarLoss: '18%' },
+                action: 'Rake out deteriorated mortar joints and perform pressure repointing with polymer-modified structural mortar.'
+            },
+            {
+                id: 'defect-4',
+                title: '1st Floor Balcony Railing Anchorage Corrosion',
+                severity: 'high',
+                position: { x: 12.0, y: 6.8, z: 6.0 },
+                photo: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=600&q=80',
+                sensorId: 'KIT-L1-RAIL',
+                metrics: { stress: '28.1 MPa', safetyFactor: '1.42', rustDepth: '2.4 mm' },
+                action: 'Remove spalled concrete around balcony railing posts, treat rebar with zinc-rich primer, and grout epoxy anchors.'
+            },
+            {
+                id: 'defect-5',
+                title: 'Courtyard Plinth Raft Corner - Differential Settlement',
+                severity: 'medium',
+                position: { x: 18.0, y: 0.4, z: 20.0 },
+                photo: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+                sensorId: 'KIT-PLINTH-E',
+                metrics: { stress: '19.4 MPa', safetyFactor: '1.75', settlement: '9.5 mm' },
+                action: 'Execute polyurethane expanding grout injection into sub-grade foundation soil near east courtyard wing.'
+            }
+        ];
 
+        let currentFilter = 'all';
+        let selectedDefect = null;
+
+        function renderWeakSpotsList() {
+            const container = document.getElementById('weak-spots-list');
+            const filtered = defectsData.filter(d => currentFilter === 'all' || d.severity === currentFilter);
+            
+            container.innerHTML = filtered.map(defect => `
+                <div id="card-${defect.id}" onclick="focusOnDefect('${defect.id}')" class="defect-card glass-card p-3 rounded-xl cursor-pointer border border-slate-800 hover:border-cyan-500/50 transition group relative overflow-hidden">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                            defect.severity === 'critical' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                            defect.severity === 'high' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                            'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                        }">
+                            ${defect.severity}
+                        </span>
+                        <span class="text-[10px] font-mono text-cyan-400">${defect.sensorId}</span>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <img src="${defect.photo}" class="w-16 h-16 rounded-lg object-cover border border-slate-700 shrink-0 group-hover:scale-105 transition" />
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-xs font-bold text-slate-100 group-hover:text-cyan-400 transition truncate">${defect.title}</h3>
+                            <div class="text-[11px] font-mono text-slate-400 mt-1">Stress: <strong class="text-slate-200">${defect.metrics.stress}</strong></div>
+                            <div class="text-[11px] font-mono text-slate-400">Safety Factor: <strong class="${defect.severity === 'critical' ? 'text-rose-400' : 'text-emerald-400'}">${defect.metrics.safetyFactor}</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-2.5 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+                        <button onclick="event.stopPropagation(); openDetailModal('${defect.id}')" class="text-cyan-400 hover:underline font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-chart-line"></i> Inspect Telemetry
+                        </button>
+                        <span class="text-slate-400 group-hover:text-cyan-300 flex items-center gap-1">
+                            Focus 3D <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterDefects(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                btn.className = "filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition";
+            });
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if (activeBtn) activeBtn.className = "filter-tab flex-1 py-1 rounded-md bg-blue-600 text-white font-medium transition";
+            renderWeakSpotsList();
+        }
