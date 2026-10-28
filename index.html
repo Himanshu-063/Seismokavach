@@ -61,29 +61,25 @@
                 <i class="fa-solid fa-building-user text-white"></i>
             </div>
             <div>
-                <h1 class="font-bold text-sm tracking-wide text-white leading-tight">
-                    SEISMOKAVACH <span class="text-xs font-normal text-rose-400 font-mono">· KIT Boys Hostel</span>
-                </h1>
-                <div class="flex items-center gap-2 text-[11px] text-slate-400">
-                    <span class="text-emerald-400 font-mono">Integrity: <strong id="header-health-idx">84%</strong></span>
-                    <span class="text-slate-600">•</span>
-                    <span class="text-rose-400 font-mono"><span id="header-anomaly-badge">5 Anomalies</span></span>
-                </div>
+                <h1 class="font-bold text-sm tracking-wide text-white leading-tight">Seismokavach</h1>
+                <div class="text-[11px] text-slate-400">KIT Boys Hostel · Building Safety Monitor</div>
             </div>
         </div>
 
         <div class="flex items-center space-x-2">
-            <!-- REPORTS BUTTON -->
             <button onclick="openReportsModal()" class="px-3.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-semibold flex items-center gap-2 transition border border-amber-500/40">
                 <i class="fa-solid fa-file-contract"></i>
                 <span>Reports</span>
             </button>
             <button onclick="runScan({ force: true })" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-2 transition">
-                <i class="fa-solid fa-brain"></i>
-                <span class="hidden sm:inline">Scan Now</span>
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                <span class="hidden sm:inline">Check Now</span>
             </button>
         </div>
     </header>
+
+    <!-- BIG STATUS BANNER (plain-language summary) -->
+    <div id="status-banner" class="shrink-0 px-4 py-2.5 border-b border-slate-800 z-30"></div>
 
     <!-- ================= MAIN ================= -->
     <div class="relative flex-1 flex flex-col md:flex-row overflow-hidden">
@@ -96,7 +92,7 @@
                 <div class="flex items-center justify-between mb-1">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-bell text-emerald-400 text-xs"></i>
-                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">Auto Alerts</h2>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">Automatic Alerts</h2>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="auto-alert-toggle" checked onchange="setAutoAlerts(this.checked)">
@@ -104,15 +100,15 @@
                     </label>
                 </div>
                 <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
-                    As soon as damage is detected, SMS + WhatsApp alerts are sent automatically.
+                    When a serious problem is found, the wardens get a WhatsApp message and an SMS automatically.
                 </p>
 
-                <div class="flex items-center gap-2 text-[11px] font-mono mb-3 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800">
+                <div class="flex items-center gap-2 text-[11px] mb-3 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800">
                     <span id="monitor-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="monitor-status" class="text-slate-300">Monitoring…</span>
+                    <span id="monitor-status" class="text-slate-300">Checking the building every minute</span>
                 </div>
 
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Recipients</div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Who gets the alerts</div>
                 <div class="space-y-2" id="authorities-container"></div>
 
                 <button onclick="broadcastToAllSelected()" class="mt-3 w-full px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center justify-center gap-2">
@@ -120,47 +116,47 @@
                 </button>
             </div>
 
-            <!-- VIEW -->
-            <div class="p-4 border-b border-slate-800">
-                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">3D View</h2>
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <button onclick="setRenderMode('solid')" id="btn-mode-solid" class="mode-btn px-2.5 py-1.5 rounded-lg bg-blue-600 text-white text-[11px] font-medium border border-blue-500 transition">Solid</button>
-                    <button onclick="setRenderMode('xray')" id="btn-mode-xray" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">X-Ray</button>
-                    <button onclick="setRenderMode('wireframe')" id="btn-mode-wireframe" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">Mesh</button>
-                    <button onclick="setRenderMode('heatmap')" id="btn-mode-heatmap" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">Heatmap</button>
-                </div>
+            <!-- ADVANCED OPTIONS (hidden by default to keep things simple) -->
+            <details class="p-4">
+                <summary class="cursor-pointer text-xs font-semibold text-slate-400 hover:text-slate-200 select-none">Advanced view options</summary>
+                <div class="mt-3">
+                    <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Model style</h2>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button onclick="setRenderMode('solid')" id="btn-mode-solid" class="mode-btn px-2.5 py-1.5 rounded-lg bg-blue-600 text-white text-[11px] font-medium border border-blue-500 transition">Normal</button>
+                        <button onclick="setRenderMode('xray')" id="btn-mode-xray" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">See-through</button>
+                        <button onclick="setRenderMode('wireframe')" id="btn-mode-wireframe" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">Wireframe</button>
+                        <button onclick="setRenderMode('heatmap')" id="btn-mode-heatmap" class="mode-btn px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px] font-medium border border-slate-700 transition">Danger map</button>
+                    </div>
 
-                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Camera</h2>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setCameraPreset('iso')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Isometric</button>
-                    <button onclick="setCameraPreset('front')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Front</button>
-                    <button onclick="setCameraPreset('staircase')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 border border-amber-500/30">Staircase</button>
-                    <button onclick="setCameraPreset('top')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Top Plan</button>
-                </div>
-            </div>
+                    <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Camera angle</h2>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button onclick="setCameraPreset('iso')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Corner view</button>
+                        <button onclick="setCameraPreset('front')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Front view</button>
+                        <button onclick="setCameraPreset('staircase')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 border border-amber-500/30">Staircase</button>
+                        <button onclick="setCameraPreset('top')" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">From above</button>
+                    </div>
 
-            <!-- LAYERS -->
-            <div class="p-4">
-                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Layers</h2>
-                <div class="space-y-1">
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-cubes-stacked text-rose-500 w-4"></i> Brick Facade</span>
-                        <input type="checkbox" checked onchange="toggleLayer('brick', this.checked)" class="accent-cyan-500 cursor-pointer">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-grip-lines-vertical text-slate-300 w-4"></i> Columns</span>
-                        <input type="checkbox" checked onchange="toggleLayer('columns', this.checked)" class="accent-cyan-500 cursor-pointer">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-stairs text-amber-400 w-4"></i> Staircase</span>
-                        <input type="checkbox" checked onchange="toggleLayer('stairs', this.checked)" class="accent-cyan-500 cursor-pointer">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-tree text-emerald-400 w-4"></i> Lawn & Bushes</span>
-                        <input type="checkbox" checked onchange="toggleLayer('lawn', this.checked)" class="accent-cyan-500 cursor-pointer">
-                    </label>
+                    <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Show / hide</h2>
+                    <div class="space-y-1">
+                        <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-cubes-stacked text-rose-500 w-4"></i> Brick walls</span>
+                            <input type="checkbox" checked onchange="toggleLayer('brick', this.checked)" class="accent-cyan-500 cursor-pointer">
+                        </label>
+                        <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-grip-lines-vertical text-slate-300 w-4"></i> Pillars</span>
+                            <input type="checkbox" checked onchange="toggleLayer('columns', this.checked)" class="accent-cyan-500 cursor-pointer">
+                        </label>
+                        <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-stairs text-amber-400 w-4"></i> Staircase</span>
+                            <input type="checkbox" checked onchange="toggleLayer('stairs', this.checked)" class="accent-cyan-500 cursor-pointer">
+                        </label>
+                        <label class="flex items-center justify-between text-xs text-slate-300 cursor-pointer p-1.5 rounded hover:bg-slate-800/50">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-tree text-emerald-400 w-4"></i> Lawn & bushes</span>
+                            <input type="checkbox" checked onchange="toggleLayer('lawn', this.checked)" class="accent-cyan-500 cursor-pointer">
+                        </label>
+                    </div>
                 </div>
-            </div>
+            </details>
         </aside>
 
         <!-- 3D VIEWPORT -->
@@ -168,33 +164,30 @@
             <div id="canvas-container" class="relative w-full h-full cursor-grab active:cursor-grabbing"></div>
             <svg id="callout-svg"></svg>
 
-            <div class="absolute top-3 right-3 glass-panel rounded-lg px-3 py-1.5 hidden sm:flex items-center space-x-3 text-[11px] font-mono text-slate-300 z-20">
-                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>FPS <strong id="fps-counter" class="text-white">60</strong></span>
-                <span class="text-slate-700">|</span>
-                <span>DIST <span id="cam-dist" class="text-cyan-300">45m</span></span>
+            <div class="absolute top-3 left-3 glass-panel rounded-lg px-3 py-2 z-20 text-[11px] text-slate-300 space-y-1">
+                <div class="font-semibold text-slate-100 mb-1">Colour guide</div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Urgent problem</div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Fix soon</div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span> Keep watching</div>
             </div>
 
-            <div class="absolute bottom-3 left-3 glass-panel px-3 py-1.5 rounded-lg text-slate-400 text-[11px] hidden sm:flex items-center space-x-4 z-20">
-                <span><i class="fa-solid fa-computer-mouse text-cyan-400 mr-1"></i>Drag: Orbit</span>
-                <span><i class="fa-solid fa-up-down-left-right text-cyan-400 mr-1"></i>Right Drag: Pan</span>
-                <span><i class="fa-solid fa-magnifying-glass-plus text-cyan-400 mr-1"></i>Scroll: Zoom</span>
+            <div class="absolute bottom-3 left-3 right-3 sm:right-auto glass-panel px-3 py-1.5 rounded-lg text-slate-400 text-[11px] z-20">
+                <i class="fa-solid fa-computer-mouse text-cyan-400 mr-1"></i> Drag to rotate · Scroll to zoom · Click a problem on the right to see where it is
             </div>
         </div>
 
-        <!-- RIGHT SIDEBAR: WEAK SPOTS -->
-        <aside id="sidebar" class="w-full md:w-80 glass-panel border-l border-slate-800/80 flex flex-col z-30 shrink-0 md:max-h-[calc(100vh-3.5rem)]">
+        <!-- RIGHT SIDEBAR: PROBLEMS FOUND -->
+        <aside id="sidebar" class="w-full md:w-80 glass-panel border-l border-slate-800/80 flex flex-col z-30 shrink-0 md:max-h-[calc(100vh-7.5rem)]">
             <div class="p-4 border-b border-slate-800">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
-                        <h2 class="font-bold text-sm tracking-wide text-white uppercase">Weak Spots</h2>
-                    </div>
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                    <h2 class="font-bold text-sm tracking-wide text-white uppercase">Problems Found</h2>
                 </div>
                 <div class="flex items-center space-x-1 p-1 rounded-lg bg-slate-950 border border-slate-800 text-xs">
                     <button onclick="filterDefects('all')" id="filter-all" class="filter-tab flex-1 py-1 rounded-md bg-blue-600 text-white font-medium transition">All</button>
-                    <button onclick="filterDefects('critical')" id="filter-critical" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Critical</button>
-                    <button onclick="filterDefects('high')" id="filter-high" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">High</button>
-                    <button onclick="filterDefects('medium')" id="filter-medium" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Med</button>
+                    <button onclick="filterDefects('critical')" id="filter-critical" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Urgent</button>
+                    <button onclick="filterDefects('high')" id="filter-high" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Soon</button>
+                    <button onclick="filterDefects('medium')" id="filter-medium" class="filter-tab flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">Watch</button>
                 </div>
             </div>
 
@@ -202,25 +195,25 @@
 
             <div class="p-3 border-t border-slate-800 bg-slate-950/90 text-xs">
                 <div class="flex items-center justify-between text-slate-400">
-                    <span>IoT Sensors</span>
-                    <span class="text-emerald-400 font-mono font-medium flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE (18 CH)
+                    <span>Building sensors</span>
+                    <span class="text-emerald-400 font-medium flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> All working
                     </span>
                 </div>
             </div>
         </aside>
     </div>
 
-    <!-- ================= DEFECT DETAIL MODAL ================= -->
+    <!-- ================= PROBLEM DETAIL MODAL ================= -->
     <div id="detail-modal" onclick="if(event.target===this) closeModal()" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col">
 
             <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
-                <div class="flex items-center space-x-3">
-                    <span id="modal-severity-badge" class="px-2.5 py-1 text-xs font-bold font-mono rounded bg-rose-500/20 text-rose-400 border border-rose-500/40">CRITICAL</span>
-                    <div>
-                        <h3 id="modal-title" class="font-bold text-sm text-white">Title</h3>
-                        <div id="modal-sensor-id" class="text-xs font-mono text-cyan-400">SENSOR</div>
+                <div class="flex items-center space-x-3 min-w-0">
+                    <span id="modal-severity-badge" class="px-2.5 py-1 text-xs font-bold rounded shrink-0">URGENT</span>
+                    <div class="min-w-0">
+                        <h3 id="modal-title" class="font-bold text-base text-white truncate">Title</h3>
+                        <div id="modal-place" class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i>Place</div>
                     </div>
                 </div>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
@@ -229,37 +222,40 @@
             </div>
 
             <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Inspection Photo</span>
-                        <div class="h-44 rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
-                            <img id="modal-photo" src="" alt="Damage Photo" class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between text-[10px] font-bold uppercase font-mono text-slate-400">
-                            <span>24hr Strain Curve</span>
-                            <span class="text-rose-400" id="modal-stress-val">--</span>
-                        </div>
-                        <div class="h-44 bg-slate-950 rounded-xl border border-slate-800 p-2 flex flex-col justify-between">
-                            <canvas id="chart-canvas" class="w-full h-32"></canvas>
-                            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-800/80">
-                                <span>Safety Factor: <strong id="modal-safety-factor" class="text-rose-400">--</strong></span>
-                                <span id="modal-extra" class="text-amber-400">--</span>
-                            </div>
-                        </div>
-                    </div>
+                <div id="modal-serious" class="text-xs font-medium px-3 py-2 rounded-lg border"></div>
+
+                <div class="h-44 rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
+                    <img id="modal-photo" src="" alt="Photo of the problem" class="w-full h-full object-cover">
                 </div>
 
                 <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Recommended Remediation</span>
-                    <p id="modal-action-plan" class="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800"></p>
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">What is wrong</div>
+                    <p id="modal-what" class="text-sm text-slate-200 leading-relaxed"></p>
                 </div>
 
-                <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
-                    <span class="text-xs text-slate-400">Send alert for this defect:</span>
-                    <button onclick="dispatchDefectAlert()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-paper-plane"></i> WhatsApp + SMS
+                <div class="space-y-1">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">What should be done</div>
+                    <p id="modal-todo" class="text-sm text-slate-200 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800"></p>
+                </div>
+
+                <details id="tech-details" ontoggle="if(this.open && selectedDefect) drawStrainChart(selectedDefect)" class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                    <summary class="cursor-pointer text-xs font-semibold text-slate-400 hover:text-slate-200">Technical details (for engineers)</summary>
+                    <div class="mt-3 space-y-2">
+                        <div class="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-300">
+                            <div>Sensor: <span id="modal-sensor-id" class="text-cyan-400"></span></div>
+                            <div>Stress: <span id="modal-stress-val" class="text-rose-400"></span></div>
+                            <div>Safety factor: <span id="modal-safety-factor" class="text-rose-400"></span></div>
+                            <div id="modal-extra" class="text-amber-400"></div>
+                        </div>
+                        <div class="text-[10px] font-mono text-slate-500">Strain over the last 24 hours</div>
+                        <canvas id="chart-canvas" class="w-full h-32"></canvas>
+                    </div>
+                </details>
+
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-3">
+                    <span class="text-xs text-slate-400">Tell the wardens about this problem:</span>
+                    <button onclick="dispatchDefectAlert()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition shrink-0">
+                        <i class="fa-solid fa-paper-plane"></i> Send alert
                     </button>
                 </div>
             </div>
@@ -277,7 +273,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-sm text-white">Damage & Repair Reports</h3>
-                        <p class="text-xs text-slate-400">KIT Boys Hostel · Audit Log</p>
+                        <p class="text-xs text-slate-400">KIT Boys Hostel · Repair history</p>
                     </div>
                 </div>
                 <button onclick="closeReportsModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
@@ -299,7 +295,7 @@
             </div>
 
             <div class="px-5 py-3 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between">
-                <span class="text-xs text-slate-400 font-mono">CSV export available</span>
+                <span class="text-xs text-slate-400 font-mono">Download as a spreadsheet (CSV) file</span>
                 <button onclick="downloadReport()" class="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-download"></i> Download Report
                 </button>
@@ -444,6 +440,55 @@
             }
         ];
 
+        // Plain-language information shown to everyone
+        const SAFETY_RATING = 84;
+
+        const sevLabel = { critical: 'Urgent', high: 'Fix soon', medium: 'Keep watching' };
+        const sevExplain = {
+            critical: 'Urgent: needs repair as soon as possible. Keep people away from this area if you can.',
+            high: 'Fix soon: not dangerous right now, but it should be repaired within the next few weeks.',
+            medium: 'Keep watching: a small problem. Plan a repair and check it regularly.'
+        };
+        const sevBox = {
+            critical: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
+            high: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+            medium: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30'
+        };
+
+        const plainInfo = {
+            'defect-1': {
+                name: 'Cracked pillar',
+                place: 'Ground floor corridor · Pillar A2',
+                what: 'A main pillar that carries the weight of the building has a long vertical crack, and it is under heavy load.',
+                todo: 'Support the pillar with temporary props right away. Then wrap it in carbon-fiber and fill the crack with repair resin.'
+            },
+            'defect-2': {
+                name: 'Staircase joint has shifted',
+                place: 'Corner staircase',
+                what: 'The staircase has moved slightly out of position where it joins the building, so it is weaker than it should be.',
+                todo: 'Fix the staircase to the building with steel plates. Until then, limit how many students use this staircase.'
+            },
+            'defect-3': {
+                name: 'Crumbling brick arches',
+                place: '2nd floor · Front wing',
+                what: 'The mortar between the bricks above the arches is wearing away, and small pieces are coming off.',
+                todo: 'Remove the damaged mortar and fill the gaps with fresh, strong mortar.'
+            },
+            'defect-4': {
+                name: 'Rusting balcony railing',
+                place: '1st floor · East balcony',
+                what: 'The metal posts holding the balcony railing are rusting inside the concrete.',
+                todo: 'Remove the damaged concrete, treat the rust, and fix the posts back in place with strong repair resin.'
+            },
+            'defect-5': {
+                name: 'Ground sinking at one corner',
+                place: 'Courtyard · East corner',
+                what: 'One corner of the building base has sunk a little more than the rest (about 1 cm).',
+                todo: 'Inject special filler into the soil under that corner to lift and support it.'
+            }
+        };
+        defectsData.forEach(d => Object.assign(d, plainInfo[d.id] || {}));
+
         let currentFilter = 'all';
         let selectedDefect = null;
 
@@ -457,27 +502,27 @@
             const container = document.getElementById('weak-spots-list');
             const filtered = defectsData.filter(d => currentFilter === 'all' || d.severity === currentFilter);
 
-            container.innerHTML = filtered.map(defect => `
-                <div id="card-${defect.id}" onclick="focusOnDefect('${defect.id}')" class="defect-card glass-card p-3 rounded-xl cursor-pointer group ${selectedDefect && selectedDefect.id === defect.id ? 'active' : ''}">
+            if (!filtered.length) {
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-8">No problems in this group.</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(d => `
+                <div id="card-${d.id}" onclick="focusOnDefect('${d.id}')" class="defect-card glass-card p-3 rounded-xl cursor-pointer group ${selectedDefect && selectedDefect.id === d.id ? 'active' : ''}">
                     <div class="flex items-center justify-between gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${severityBadge(defect.severity)}">${defect.severity}</span>
-                        <span class="text-[10px] font-mono text-cyan-400">${defect.sensorId}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${severityBadge(d.severity)}">${sevLabel[d.severity]}</span>
+                        <span class="text-[11px] text-slate-400 truncate"><i class="fa-solid fa-location-dot mr-1"></i>${d.place}</span>
                     </div>
                     <div class="flex gap-3">
-                        <img src="${defect.photo}" class="w-14 h-14 rounded-lg object-cover border border-slate-700 shrink-0" />
+                        <img src="${d.photo}" class="w-14 h-14 rounded-lg object-cover border border-slate-700 shrink-0" />
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-xs font-bold text-slate-100 group-hover:text-cyan-400 transition line-clamp-2">${defect.title}</h3>
-                            <div class="text-[11px] font-mono text-slate-400 mt-1">
-                                SF: <strong class="${parseFloat(defect.metrics.safetyFactor) < CONFIG.CRITICAL_SAFETY_FACTOR ? 'text-rose-400' : 'text-emerald-400'}">${defect.metrics.safetyFactor}</strong>
-                                · ${defect.metrics.stress}
-                            </div>
+                            <h3 class="text-sm font-bold text-slate-100 group-hover:text-cyan-400 transition">${d.name}</h3>
+                            <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">${d.what}</p>
                         </div>
                     </div>
-                    <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
-                        <button onclick="event.stopPropagation(); openDetailModal('${defect.id}')" class="text-cyan-400 hover:underline font-semibold flex items-center gap-1">
-                            <i class="fa-solid fa-chart-line"></i> Details
-                        </button>
-                        <span class="text-slate-500 group-hover:text-cyan-300">Focus 3D <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs">
+                        <button onclick="event.stopPropagation(); openDetailModal('${d.id}')" class="text-cyan-400 hover:underline font-semibold">See details</button>
+                        <span class="text-slate-500 group-hover:text-cyan-300">Show on 3D model <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
                     </div>
                 </div>
             `).join('');
@@ -493,8 +538,48 @@
             renderWeakSpotsList();
         }
 
-        function updateHeaderBadge() {
-            document.getElementById('header-anomaly-badge').textContent = `${defectsData.length} Anomalies`;
+        function updateStatusBanner() {
+            const el = document.getElementById('status-banner');
+            if (!el) return;
+            const urgent = defectsData.filter(d => d.severity === 'critical').length;
+            const soon = defectsData.filter(d => d.severity === 'high').length;
+            const watch = defectsData.filter(d => d.severity === 'medium').length;
+
+            let theme, icon, title, text;
+            if (urgent > 0) {
+                theme = 'bg-rose-950/60';
+                icon = 'fa-triangle-exclamation text-rose-400';
+                title = 'Needs urgent attention';
+                text = `${urgent} serious problem${urgent > 1 ? 's' : ''} found in the building. ` +
+                    (autoAlertsOn ? 'The wardens are being notified automatically by WhatsApp and SMS.'
+                                  : 'Automatic alerts are OFF - turn them on to notify the wardens.');
+            } else if (soon > 0) {
+                theme = 'bg-amber-950/50';
+                icon = 'fa-screwdriver-wrench text-amber-400';
+                title = 'Needs repair soon';
+                text = `${soon} problem${soon > 1 ? 's' : ''} should be fixed in the next few weeks.`;
+            } else {
+                theme = 'bg-emerald-950/50';
+                icon = 'fa-circle-check text-emerald-400';
+                title = 'The building looks safe';
+                text = 'No serious problems found.';
+            }
+
+            el.className = `shrink-0 px-4 py-2.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 z-30 ${theme}`;
+            el.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid ${icon} text-2xl"></i>
+                    <div>
+                        <div class="text-sm font-bold text-white">${title}</div>
+                        <div class="text-xs text-slate-300">${text}</div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-[11px] font-medium">
+                    <span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">Urgent: ${urgent}</span>
+                    <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Fix soon: ${soon}</span>
+                    <span class="px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">Watch: ${watch}</span>
+                    <span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-200 border border-slate-700">Safety rating: <strong>${SAFETY_RATING}%</strong></span>
+                </div>`;
         }
 
         /* =====================================================================
@@ -540,13 +625,13 @@
                 let anySent = false;
                 data.results.forEach(r => {
                     if (r.skipped) {
-                        showToast(`${r.name}: skipped (${r.skipped})`, 'info');
+                        showToast(String(r.skipped).includes('recently') ? `${r.name} was already alerted a few minutes ago.` : `${r.name}: not sent (${r.skipped})`, 'info');
                         return;
                     }
                     const smsOk = r.sms && r.sms.ok;
                     const waOk = r.whatsapp && r.whatsapp.ok;
                     if (smsOk || waOk) anySent = true;
-                    showToast(`${r.name}: SMS ${smsOk ? '✔' : '✖'} | WhatsApp ${waOk ? '✔' : '✖'}${r.dry ? ' (test mode - printed in server terminal)' : ''}`, (smsOk || waOk) ? 'success' : 'error');
+                    showToast(`${r.name}: WhatsApp ${waOk ? 'sent ✔' : 'failed ✖'} · SMS ${smsOk ? 'sent ✔' : 'failed ✖'}${r.dry ? ' (test mode - only shown in the server terminal)' : ''}`, (smsOk || waOk) ? 'success' : 'error');
                 });
                 return anySent;
             } catch (err) {
@@ -559,7 +644,7 @@
         async function runScan({ force = false } = {}) {
             if (scanInProgress) return;
             scanInProgress = true;
-            setMonitorStatus('Scanning…', 'amber');
+            setMonitorStatus('Checking the building…', 'amber');
 
             await new Promise(r => setTimeout(r, 800)); // scan animation delay
 
@@ -567,14 +652,14 @@
             const stamp = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
             if (damaged.length > 0) {
-                showToast(`🚨 ${damaged.length} critical damage detected!`, 'error');
+                showToast(`🚨 ${damaged.length} urgent problem${damaged.length > 1 ? 's' : ''} found!`, 'error');
                 if (autoAlertsOn || force) {
                     await sendAlertsViaServer(getSelectedAuthorities(), damaged, { force: false });
                 }
-                setMonitorStatus(`${damaged.length} critical · last scan ${stamp}`, 'rose');
+                setMonitorStatus(`${damaged.length} urgent problem${damaged.length > 1 ? 's' : ''} · checked at ${stamp}`, 'rose');
             } else {
-                setMonitorStatus(`All normal · last scan ${stamp}`, 'emerald');
-                if (force) showToast('Scan complete: everything is normal.', 'success');
+                setMonitorStatus(`All good · checked at ${stamp}`, 'emerald');
+                if (force) showToast('Check complete: no urgent problems.', 'success');
             }
             scanInProgress = false;
         }
@@ -600,13 +685,14 @@
 
         function setAutoAlerts(on) {
             autoAlertsOn = on;
+            updateStatusBanner();
             if (on) {
                 startAutoMonitor();
-                showToast('Auto alerts ON', 'success');
+                showToast('Automatic alerts are ON', 'success');
             } else {
                 stopAutoMonitor();
-                setMonitorStatus('Auto alerts OFF', 'slate');
-                showToast('Auto alerts OFF', 'info');
+                setMonitorStatus('Automatic alerts are OFF', 'slate');
+                showToast('Automatic alerts are OFF', 'info');
             }
         }
 
@@ -614,7 +700,7 @@
         function broadcastToAllSelected() {
             const damaged = detectDamage();
             if (!damaged.length) {
-                showToast('No critical damage right now.', 'info');
+                showToast('There are no urgent problems right now.', 'info');
                 return;
             }
             sendAlertsViaServer(getSelectedAuthorities(), damaged, { force: true });
@@ -646,19 +732,27 @@
             selectedDefect = d;
 
             const badge = document.getElementById('modal-severity-badge');
-            badge.textContent = d.severity.toUpperCase();
-            badge.className = `px-2.5 py-1 text-xs font-bold font-mono rounded ${severityBadge(d.severity)}`;
+            badge.textContent = sevLabel[d.severity].toUpperCase();
+            badge.className = `px-2.5 py-1 text-xs font-bold rounded shrink-0 ${severityBadge(d.severity)}`;
 
-            document.getElementById('modal-title').textContent = d.title;
-            document.getElementById('modal-sensor-id').textContent = `SENSOR #${d.sensorId}`;
+            document.getElementById('modal-title').textContent = d.name;
+            document.getElementById('modal-place').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i>${d.place}`;
+
+            const box = document.getElementById('modal-serious');
+            box.textContent = sevExplain[d.severity];
+            box.className = `text-xs font-medium px-3 py-2 rounded-lg border ${sevBox[d.severity]}`;
+
             document.getElementById('modal-photo').src = d.photo;
+            document.getElementById('modal-what').textContent = d.what;
+            document.getElementById('modal-todo').textContent = d.todo;
+
+            document.getElementById('modal-sensor-id').textContent = d.sensorId;
             document.getElementById('modal-stress-val').textContent = d.metrics.stress;
             document.getElementById('modal-safety-factor').textContent = d.metrics.safetyFactor;
             document.getElementById('modal-extra').textContent = d.extra || '';
-            document.getElementById('modal-action-plan').textContent = d.action;
+            document.getElementById('tech-details').open = false;
 
             showModal('detail-modal');
-            requestAnimationFrame(() => drawStrainChart(d));
         }
 
         function closeModal() { hideModal('detail-modal'); }
@@ -713,10 +807,10 @@
                 label: 'October 2026',
                 epoxyLiters: 14.5,
                 entries: [
-                    { task: 'CFRP Column Jacketing (Pillar A2)', date: 'Oct 12, 2026', vendor: 'UltraTech Structural', status: 'completed', cost: 62000 },
-                    { task: 'Staircase Landing Dowel Anchoring', date: 'Oct 22, 2026', vendor: 'Structural Team B', status: 'in-progress', cost: 38000 },
-                    { task: 'Brick Arch Lintel Repointing (2nd Floor)', date: 'Oct 25, 2026', vendor: 'KIT Maintenance', status: 'completed', cost: 27000 },
-                    { task: 'Balcony Railing Anchor Corrosion Treatment', date: 'Nov 02, 2026', vendor: 'KIT Maintenance', status: 'scheduled', cost: 15000 }
+                    { task: 'Pillar A2 strengthened with carbon-fiber wrap', date: 'Oct 12, 2026', vendor: 'UltraTech Structural', status: 'completed', cost: 62000 },
+                    { task: 'Staircase landing fixed with steel pins', date: 'Oct 22, 2026', vendor: 'Structural Team B', status: 'in-progress', cost: 38000 },
+                    { task: '2nd floor brick arches re-filled with fresh mortar', date: 'Oct 25, 2026', vendor: 'KIT Maintenance', status: 'completed', cost: 27000 },
+                    { task: 'Balcony railing rust treated', date: 'Nov 02, 2026', vendor: 'KIT Maintenance', status: 'scheduled', cost: 15000 }
                 ]
             },
             yearly: {
@@ -731,7 +825,7 @@
                     { m: 'Jul', found: 3, repaired: 2 }, { m: 'Aug', found: 2, repaired: 2 },
                     { m: 'Sep', found: 2, repaired: 1 }, { m: 'Oct', found: 2, repaired: 1 }
                 ],
-                note: 'Monsoon seepage at the plinth base reduced the structural health index by 4.2% in 2026. Carbon-fiber wrapping on Ground Floor columns stabilized load redistribution across Wings A and B.'
+                note: 'Rain water seeping into the base of the building lowered the overall safety rating by 4.2% this year. Repairs on the ground-floor pillars helped spread the weight safely across both wings of the building.'
             }
         };
 
@@ -769,9 +863,9 @@
                 box.innerHTML = `
                     <div class="text-xs text-slate-400 font-mono">Month: <span class="text-amber-300">${r.label}</span></div>
                     <div class="grid grid-cols-3 gap-3">
-                        ${statCard('Repairs', `${done}/${r.entries.length} Done`, 'text-emerald-400')}
-                        ${statCard('Epoxy Grout', `${r.epoxyLiters} L`, 'text-cyan-400')}
-                        ${statCard('Cost', inr(total), 'text-amber-400')}
+                        ${statCard('Repairs Done', `${done} of ${r.entries.length}`, 'text-emerald-400')}
+                        ${statCard('Repair Material Used', `${r.epoxyLiters} L`, 'text-cyan-400')}
+                        ${statCard('Money Spent', inr(total), 'text-amber-400')}
                     </div>
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Repair Log</div>
@@ -781,7 +875,7 @@
                                     <div class="text-xs font-semibold text-slate-200">${e.task}</div>
                                     <div class="text-[10px] text-slate-400 font-mono">${e.date} · ${e.vendor} · ${inr(e.cost)}</div>
                                 </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] uppercase border shrink-0 ${statusStyle[e.status]}">${e.status.replace('-', ' ')}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] uppercase border shrink-0 ${statusStyle[e.status]}">${({ 'completed': 'Done', 'in-progress': 'In progress', 'scheduled': 'Planned' })[e.status]}</span>
                             </div>
                         `).join('')}
                     </div>`;
@@ -794,16 +888,16 @@
                 box.innerHTML = `
                     <div class="text-xs text-slate-400 font-mono">Year: <span class="text-amber-300">${r.year}</span></div>
                     <div class="grid grid-cols-3 gap-3">
-                        ${statCard('Damage Found', `${found}`, 'text-rose-400')}
-                        ${statCard('Repaired', `${repaired}`, 'text-emerald-400')}
-                        ${statCard('Retrofit Budget', inr(r.budget), 'text-cyan-400')}
+                        ${statCard('Problems Found', `${found}`, 'text-rose-400')}
+                        ${statCard('Problems Fixed', `${repaired}`, 'text-emerald-400')}
+                        ${statCard('Yearly Budget', inr(r.budget), 'text-cyan-400')}
                     </div>
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                         <div class="flex items-center justify-between mb-3">
-                            <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Month-wise Damage vs Repair</div>
+                            <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Problems found vs fixed, month by month</div>
                             <div class="flex items-center gap-3 text-[10px] text-slate-400">
                                 <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-rose-500"></span>Found</span>
-                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-emerald-500"></span>Repaired</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-emerald-500"></span>Fixed</span>
                             </div>
                         </div>
                         <div class="flex items-end gap-2 h-32">
@@ -819,11 +913,11 @@
                         </div>
                     </div>
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                        <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Annual Trend</div>
+                        <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">What happened this year</div>
                         <p class="text-xs text-slate-400 leading-relaxed">${r.note}</p>
                         <div class="flex gap-4 text-[11px] font-mono pt-1">
-                            <span class="text-rose-400">Health index drop: -${r.healthDrop}%</span>
-                            <span class="text-emerald-400">Retrofit gain: +${r.integrityGain}%</span>
+                            <span class="text-rose-400">Safety rating dropped by ${r.healthDrop}%</span>
+                            <span class="text-emerald-400">Repairs improved safety by ${r.integrityGain}%</span>
                         </div>
                     </div>`;
             }
@@ -1227,16 +1321,6 @@
             updateSVGCallouts();
             renderer.render(scene, camera);
 
-            // FPS + camera distance
-            frames++;
-            const now = performance.now();
-            if (now - lastFpsUpdate >= 1000) {
-                document.getElementById('fps-counter').textContent = frames;
-                frames = 0;
-                lastFpsUpdate = now;
-                const t = controls ? controls.target : new THREE.Vector3(0, 7, 0);
-                document.getElementById('cam-dist').textContent = Math.round(camera.position.distanceTo(t)) + 'm';
-            }
         }
 
         function onWindowResize() {
@@ -1254,7 +1338,7 @@
         ===================================================================== */
         window.addEventListener('load', () => {
             renderAuthoritiesList();
-            updateHeaderBadge();
+            updateStatusBanner();
             initThree();
             focusOnDefect(defectsData[0].id);
             renderWeakSpotsList();
