@@ -297,3 +297,18 @@
                             <span class="absolute bottom-2 left-2 text-[10px] font-mono bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">CAM #KIT-HOSTEL-02</span>
                         </div>
                     </div>
+ <!-- 24hr Telemetry Chart -->
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-[10px] font-bold uppercase font-mono text-slate-400">
+                            <span>24hr Strain Sensor Curve</span>
+                            <span class="text-rose-400" id="modal-stress-val">44.2 MPa</span>
+                        </div>
+                        <div class="h-44 bg-slate-950 rounded-xl border border-slate-800 p-2 flex flex-col justify-between">
+                            <canvas id="chart-canvas" class="w-full h-32"></canvas>
+                            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-800/80">
+                                <span>Safety Factor: <strong id="modal-safety-factor" class="text-rose-400">1.12</strong></span>
+                                <span>Status: <strong class="text-amber-400">High Stress</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
