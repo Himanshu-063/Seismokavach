@@ -709,3 +709,120 @@
             materials.xray = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, transparent: true, opacity: 0.3, roughness: 0.1 });
             materials.heatmap = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
         }
+
+        /* =========================================================================
+           4. PROCEDURAL KIT HOSTEL ARCHITECTURE (3-STORY L-SHAPED BLOCK)
+           ========================================================================= */
+        function buildKITBoysHostelModel() {
+            const stories = 3; // Ground + 1st + 2nd Floor
+            const storyHeight = 4.2;
+            const wingWidth = 8.0;
+
+            // 1. COURTYARD LAWN & LANDSCAPING BASE
+            const lawnGeo = new THREE.PlaneGeometry(80, 80);
+            const lawnMesh = new THREE.Mesh(lawnGeo, materials.lawnGreen);
+            lawnMesh.rotation.x = -Math.PI / 2;
+            lawnMesh.position.y = -0.05;
+            lawnMesh.receiveShadow = true;
+            lawnGroup.add(lawnMesh);
+
+            const gridHelper = new THREE.GridHelper(80, 20, 0x10b981, 0x1e293b);
+            gridHelper.position.y = 0.01;
+            lawnGroup.add(gridHelper);
+
+            // Garden Bushes along Courtyard Edge
+            for (let bx = -18; bx <= 18; bx += 3) {
+                const bushGeo = new THREE.SphereGeometry(0.7 + Math.random() * 0.3, 8, 8);
+                const bush = new THREE.Mesh(bushGeo, materials.bushGreen);
+                bush.position.set(bx, 0.5, 4.5);
+                lawnGroup.add(bush);
+            }
+
+            // 2. L-SHAPED HOSTEL BUILDING WINGS
+            // Wing A (Main Front Wing): X from -20 to 18, Z around -4
+            // Wing B (East Side Wing): Z from -4 to 22, X around 14
+
+            // Base Foundation Plinth Pad
+            const plinthGeoA = new THREE.BoxGeometry(39, 0.6, 9);
+            const plinthA = new THREE.Mesh(plinthGeoA, materials.whiteConcrete);
+            plinthA.position.set(-1, 0.3, -4);
+            brickGroup.add(plinthA);
+
+            const plinthGeoB = new THREE.BoxGeometry(9, 0.6, 26);
+            const plinthB = new THREE.Mesh(plinthGeoB, materials.whiteConcrete);
+            plinthB.position.set(14, 0.3, 9.5);
+            brickGroup.add(plinthB);
+
+            // CONSTRUCT 3 STORIES (Ground + Floor 1 + Floor 2)
+            for (let s = 0; s < stories; s++) {
+                const floorY = s * storyHeight + 0.6;
+
+                // Thick White Concrete Floor Slabs & Balcony Trim Bands
+                const slabA = new THREE.Mesh(new THREE.BoxGeometry(40, 0.45, 9.5), materials.whiteConcrete);
+                slabA.position.set(-1, floorY + storyHeight, -4);
+                brickGroup.add(slabA);
+
+                const slabB = new THREE.Mesh(new THREE.BoxGeometry(9.5, 0.45, 27), materials.whiteConcrete);
+                slabB.position.set(14, floorY + storyHeight, 9.5);
+                brickGroup.add(slabB);
+
+                // Recessed Back Wall & Windows (Wing A)
+                const backWallA = new THREE.Mesh(new THREE.BoxGeometry(38, storyHeight, 0.3), materials.corridorWall);
+                backWallA.position.set(-1, floorY + storyHeight / 2, -7.8);
+                brickGroup.add(backWallA);
+
+                // Recessed Back Wall & Windows (Wing B)
+                const backWallB = new THREE.Mesh(new THREE.BoxGeometry(0.3, storyHeight, 25), materials.corridorWall);
+                backWallB.position.set(17.8, floorY + storyHeight / 2, 9.5);
+                brickGroup.add(backWallB);
+
+                // Windows & Doors along Wing A
+                for (let wx = -18; wx <= 14; wx += 4) {
+                    const winGeo = new THREE.BoxGeometry(1.8, 1.6, 0.1);
+                    const win = new THREE.Mesh(winGeo, materials.darkWindow);
+                    win.position.set(wx, floorY + storyHeight / 2 + 0.3, -7.6);
+                    brickGroup.add(win);
+                }
+
+                // RED BRICK ARCH BAYS & WHITE CIRCULAR COLUMNS (WING A)
+                for (let bx = -18; bx <= 12; bx += 4) {
+                    // Left & Right Red Brick Piers
+                    const pierGeo = new THREE.BoxGeometry(0.7, storyHeight, 0.7);
+                    const pier = new THREE.Mesh(pierGeo, materials.redBrick);
+                    pier.position.set(bx, floorY + storyHeight / 2, -0.6);
+                    brickGroup.add(pier);
+
+                    // Red Brick Arch Lintel Top Piece
+                    const archLintelGeo = new THREE.BoxGeometry(3.4, 0.6, 0.7);
+                    const archLintel = new THREE.Mesh(archLintelGeo, materials.redBrick);
+                    archLintel.position.set(bx + 2.0, floorY + storyHeight - 0.3, -0.6);
+                    brickGroup.add(archLintel);
+
+                    // White Circular Support Columns along Front Walkway
+                    const colGeo = new THREE.CylinderGeometry(0.22, 0.22, storyHeight - 0.4, 16);
+                    const col = new THREE.Mesh(colGeo, materials.whiteConcrete);
+                    col.position.set(bx + 2.0, floorY + (storyHeight - 0.4) / 2, -0.1);
+                    columnsGroup.add(col);
+
+                    // Balcony Handrail Line
+                    const railGeo = new THREE.BoxGeometry(3.3, 0.1, 0.08);
+                    const rail = new THREE.Mesh(railGeo, materials.whiteConcrete);
+                    rail.position.set(bx + 2.0, floorY + 1.1, -0.1);
+                    columnsGroup.add(rail);
+                }
+
+                // RED BRICK ARCH BAYS & WHITE CIRCULAR COLUMNS (WING B - EAST WING)
+                for (let bz = 0; bz <= 20; bz += 4) {
+                    const pier = new THREE.Mesh(new THREE.BoxGeometry(0.7, storyHeight, 0.7), materials.redBrick);
+                    pier.position.set(9.6, floorY + storyHeight / 2, bz);
+                    brickGroup.add(pier);
+
+                    const archLintel = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 3.4), materials.redBrick);
+                    archLintel.position.set(9.6, floorY + storyHeight - 0.3, bz + 2.0);
+                    brickGroup.add(archLintel);
+
+                    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, storyHeight - 0.4, 16), materials.whiteConcrete);
+                    col.position.set(9.1, floorY + (storyHeight - 0.4) / 2, bz + 2.0);
+                    columnsGroup.add(col);
+                }
+            }
