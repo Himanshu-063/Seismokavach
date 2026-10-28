@@ -345,3 +345,123 @@
     <!-- TOAST POPUP CONTAINER -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- JAVASCRIPT LOGIC & THREE.JS ENGINE -->
+    <script>
+        /* =========================================================================
+           1. HOSTEL AUTHORITIES DATA & ALERT DISPATCH SYSTEM
+           ========================================================================= */
+        const authoritiesData = [
+            {
+                id: 'auth-1',
+                name: 'Himanshu kumar',
+                role: 'Hostel Chief Warden',
+                phone: '+91 6393670469',
+                rawPhone: '916393670469',
+                selected: true
+            },
+        ];
+
+        function renderAuthoritiesList() {
+            const container = document.getElementById('authorities-container');
+            container.innerHTML = authoritiesData.map(auth => `
+                <div class="glass-card p-2.5 rounded-xl flex items-center justify-between gap-2 border border-slate-800 hover:border-slate-700 transition">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="${auth.id}" ${auth.selected ? 'checked' : ''} onchange="toggleAuthoritySelection('${auth.id}', this.checked)" class="accent-cyan-500 rounded cursor-pointer">
+                        <div>
+                            <div class="text-xs font-bold text-slate-100">${auth.name}</div>
+                            <div class="text-[10px] text-slate-400 font-medium">${auth.role}</div>
+                            <div class="text-[10px] font-mono text-slate-500">${auth.phone}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-1">
+                        <button onclick="sendWhatsAppTo('${auth.id}')" title="WhatsApp Alert" class="w-7 h-7 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs transition">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </button>
+                        <button onclick="sendSMSTo('${auth.id}')" title="SMS Alert" class="w-7 h-7 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-xs transition">
+                            <i class="fa-solid fa-comment-sms"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAuthoritySelection(id, isChecked) {
+            const auth = authoritiesData.find(a => a.id === id);
+            if (auth) auth.selected = isChecked;
+        }
+
+        function toggleSelectAllAuthorities(checkbox) {
+            authoritiesData.forEach(a => {
+                a.selected = checkbox.checked;
+                const el = document.getElementById(a.id);
+                if (el) el.checked = checkbox.checked;
+            });
+        }
+
+        function generateBuildingSummaryReport() {
+            return encodeURIComponent(
+                `🚨 *STRUCTURAL ALERT - Seismokavach*\n` +
+                `Building Health Index: *84% (MODERATE RISK)*\n` +
+                `Active Defects: 5 Total (2 CRITICAL)\n\n` +
+                `*Critical Issues Highlighted:*\n` +
+                `1. Ground Floor Corridor Pillar A2: Vertical Shear Compression Crack (44.2 MPa stress)\n` +
+                `2. Corner Zig-Zag Staircase Joint: Flight Displacement (14.2 mm drift)\n\n` +
+                `Full telemetry data & 3D coordinate model logged on BIM server.`
+            );
+        }
+
+        function sendWhatsAppTo(authId) {
+            const auth = authoritiesData.find(a => a.id === authId);
+            if (!auth) return;
+            const text = generateBuildingSummaryReport();
+            window.open(`https://api.whatsapp.com/send?phone=${auth.rawPhone}&text=${text}`, '_blank');
+            showToast(`WhatsApp alert dispatched to ${auth.name} (${auth.role})`, 'success');
+        }
+
+        function sendSMSTo(authId) {
+            const auth = authoritiesData.find(a => a.id === authId);
+            if (!auth) return;
+            const text = generateBuildingSummaryReport();
+            window.open(`sms:${auth.rawPhone}?body=${text}`, '_blank');
+            showToast(`SMS alert dispatched to ${auth.name} (${auth.role})`, 'info');
+        }
+
+        function broadcastToAllSelected() {
+            const selected = authoritiesData.filter(a => a.selected);
+            if (selected.length === 0) {
+                showToast('Select at least one authority recipient.', 'error');
+                return;
+            }
+            selected.forEach(auth => sendWhatsAppTo(auth.id));
+            showToast(`Broadcast dispatches sent to ${selected.length} authorities!`, 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200',
+                error: 'bg-rose-950/90 border-rose-500/50 text-rose-200',
+                info: 'bg-cyan-950/90 border-cyan-500/50 text-cyan-200'
+            };
+
+            const icons = {
+                success: 'fa-circle-check text-emerald-400',
+                error: 'fa-circle-exclamation text-rose-400',
+                info: 'fa-circle-info text-cyan-400'
+            };
+
+            toast.className = `toast-animate pointer-events-auto px-4 py-3 rounded-xl border ${colors[type]} shadow-xl flex items-center gap-3 backdrop-blur-md text-xs font-medium`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type]} text-base"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+
