@@ -1022,3 +1022,118 @@
             if (layer === 'stairs') stairsGroup.visible = isVisible;
             if (layer === 'lawn') lawnGroup.visible = isVisible;
         }
+/* =========================================================================
+           8. PYTHON AI BACKEND INTEGRATION & MODAL
+           ========================================================================= */
+        async function runAIAgentScan() {
+            showToast("Connecting to Python Multi-Agent AI Engine (Port 8000)...", "info");
+
+            const payload = {
+                building_id: "KIT-BOYS-HOSTEL-KANPUR",
+                building_age_years: 14,
+                simulated_earthquake_richter: 6.5,
+                sensor_readings: defectsData.map(d => ({
+                    sensor_id: d.sensorId,
+                    location: d.title,
+                    stress_mpa: parseFloat(d.metrics.stress),
+                    crack_width_mm: parseFloat(d.metrics.crackWidth || "3.5"),
+                    vibration_hz: 14.5
+                }))
+            };
+
+            try {
+                const response = await fetch("http://localhost:8000/api/telemetry/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("Backend server offline");
+
+                const data = await response.json();
+
+                document.getElementById('header-health-idx').innerText = `${Math.round(data.structural_health_index_pct)}%`;
+                
+                if (data.alert_triggered) {
+                    showToast(`🚨 HEALTH DROP: ${data.structural_health_index_pct}%. Emergency WhatsApp & SMS Alerts Dispatched!`, "error");
+                } else {
+                    showToast("AI Agent Scan Completed. Structural metrics updated.", "success");
+                }
+
+                openDetailModal(defectsData[0].id);
+
+            } catch (err) {
+                console.warn("AI Backend unreachable, presenting offline inspection telemetry.", err);
+                showToast("Backend Server Offline (localhost:8000). Displaying local simulation.", "info");
+                openDetailModal(defectsData[0].id);
+            }
+        }
+
+        function openDetailModal(id) {
+            const defect = defectsData.find(d => d.id === id);
+            if (!defect) return;
+            selectedDefect = defect;
+
+            document.getElementById('modal-title').innerText = defect.title;
+            document.getElementById('modal-photo').src = defect.photo;
+            document.getElementById('modal-stress-val').innerText = defect.metrics.stress;
+            document.getElementById('modal-safety-factor').innerText = defect.metrics.safetyFactor;
+            document.getElementById('modal-coords').innerText = `X: ${defect.position.x}, Y: ${defect.position.y}, Z: ${defect.position.z} (${defect.title})`;
+            document.getElementById('modal-sensor-id').innerText = `SENSOR #${defect.sensorId}`;
+            document.getElementById('modal-action-plan').innerText = defect.action;
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+            drawTelemetryChart();
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        function drawTelemetryChart() {
+            const canvas = document.getElementById('chart-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 128;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            for (let y = 20; y < canvas.height; y += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+
+            const points = [32, 35, 30, 42, 58, 52, 68, 74, 69, 88, 82, 94];
+            const stepX = canvas.width / (points.length - 1);
+
+            points.forEach((pt, i) => {
+                const x = i * stepX;
+                const y = canvas.height - (pt / 100) * (canvas.height - 20);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+
+        function dispatchDefectWhatsApp() {
+            if (!selectedDefect) return;
+            const text = encodeURIComponent(`⚠️ *KIT HOSTEL DEFECT ALERT*: ${selectedDefect.title}\nStress: ${selectedDefect.metrics.stress}\nAction: ${selectedDefect.action}`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+            showToast('Defect report sent via WhatsApp', 'success');
+        }
+
+        function dispatchDefectSMS() {
+            if (!selectedDefect) return;
+            const text = encodeURIComponent(`KIT HOSTEL DEFECT: ${selectedDefect.title} - Stress: ${selectedDefect.metrics.stress}. Action: ${selectedDefect.action}`);
+            window.open(`sms:?body=${text}`, '_blank');
+            showToast('Defect report sent via SMS', 'info');
+        }
