@@ -133,3 +133,19 @@
                 <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
                     Select recipients to dispatch instant structural risk breakdown alerts to their mobile phones.
                 </p>
+                <!-- Authority Recipient Cards -->
+                <div class="space-y-2.5" id="authorities-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Mass Broadcast Trigger -->
+                <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                    <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+                        <input type="checkbox" id="select-all-authorities" checked onchange="toggleSelectAllAuthorities(this)" class="rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-0">
+                        Select All
+                    </label>
+                    <button onclick="broadcastToAllSelected()" class="px-2.5 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-400 border border-cyan-500/30 text-[11px] font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp"></i> Broadcast Selected
+                    </button>
+                </div>
+            </div>
