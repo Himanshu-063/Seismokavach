@@ -104,7 +104,7 @@
                     </label>
                 </div>
                 <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
-                    Damage detect hote hi SMS + WhatsApp apne aap chala jayega.
+                    As soon as damage is detected, SMS + WhatsApp alerts are sent automatically.
                 </p>
 
                 <div class="flex items-center gap-2 text-[11px] font-mono mb-3 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800">
@@ -257,7 +257,7 @@
                 </div>
 
                 <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
-                    <span class="text-xs text-slate-400">Is defect ka alert bhejo:</span>
+                    <span class="text-xs text-slate-400">Send alert for this defect:</span>
                     <button onclick="dispatchDefectAlert()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
                         <i class="fa-solid fa-paper-plane"></i> WhatsApp + SMS
                     </button>
@@ -311,12 +311,12 @@
 
     <script>
         /* =====================================================================
-           0. CONFIG  (yahin se settings badlo)
+           0. CONFIG  (change settings here)
         ===================================================================== */
         const CONFIG = {
-            ALERT_API: 'http://localhost:3000',   // server.js ka URL (deploy kiya ho to wahan ka URL)
-            SCAN_INTERVAL_MS: 60 * 1000,          // har 60 sec mein auto scan
-            CRITICAL_SAFETY_FACTOR: 1.2           // isse kam safety factor = critical damage
+            ALERT_API: 'http://localhost:3000',   // URL of server.js (use the deployed URL if hosted elsewhere)
+            SCAN_INTERVAL_MS: 60 * 1000,          // auto scan every 60 sec
+            CRITICAL_SAFETY_FACTOR: 1.2           // safety factor below this = critical damage
         };
 
         /* =====================================================================
@@ -331,7 +331,7 @@
                 rawPhone: '916393670469',
                 selected: true
             }
-            // Aur authority add karni ho to upar jaisa ek object aur daal do
+            // To add more authorities, copy the object above
         ];
 
         function renderAuthoritiesList() {
@@ -504,7 +504,7 @@
         let monitorTimer = null;
         let scanInProgress = false;
 
-        // Damage detect karne ka rule
+        // Rule to detect damage
         function detectDamage() {
             return defectsData.filter(d =>
                 d.severity === 'critical' ||
@@ -512,15 +512,15 @@
             );
         }
 
-        // Server ko sirf zaroori fields bhejo
+        // Send only the required fields to the server
         function slimDefect(d) {
             return { id: d.id, title: d.title, severity: d.severity, sensorId: d.sensorId, metrics: d.metrics, action: d.action };
         }
 
-        // Asli sender: server.js ko call karta hai, wahi SMS + WhatsApp bhejta hai
+        // Real sender: calls server.js, which sends SMS + WhatsApp
         async function sendAlertsViaServer(recipients, defects, { force = false } = {}) {
             if (!recipients.length) {
-                showToast('Kam se kam ek recipient select karo.', 'error');
+                showToast('Select at least one recipient.', 'error');
                 return false;
             }
             try {
@@ -540,22 +540,22 @@
                 let anySent = false;
                 data.results.forEach(r => {
                     if (r.skipped) {
-                        showToast(`${r.name}: skip (${r.skipped})`, 'info');
+                        showToast(`${r.name}: skipped (${r.skipped})`, 'info');
                         return;
                     }
                     const smsOk = r.sms && r.sms.ok;
                     const waOk = r.whatsapp && r.whatsapp.ok;
                     if (smsOk || waOk) anySent = true;
-                    showToast(`${r.name}: SMS ${smsOk ? '✔' : '✖'} | WhatsApp ${waOk ? '✔' : '✖'}`, (smsOk || waOk) ? 'success' : 'error');
+                    showToast(`${r.name}: SMS ${smsOk ? '✔' : '✖'} | WhatsApp ${waOk ? '✔' : '✖'}${r.dry ? ' (test mode - printed in server terminal)' : ''}`, (smsOk || waOk) ? 'success' : 'error');
                 });
                 return anySent;
             } catch (err) {
-                showToast(`Alert server se connect nahi hua (${err.message}). server.js chalu hai?`, 'error');
+                showToast(`Cannot reach the alert server (${err.message}). Is server.js running?`, 'error');
                 return false;
             }
         }
 
-        // Scan: damage mila to automatic alert
+        // Scan: automatic alert when damage is found
         async function runScan({ force = false } = {}) {
             if (scanInProgress) return;
             scanInProgress = true;
@@ -567,14 +567,14 @@
             const stamp = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
             if (damaged.length > 0) {
-                showToast(`🚨 ${damaged.length} critical damage detect hua!`, 'error');
+                showToast(`🚨 ${damaged.length} critical damage detected!`, 'error');
                 if (autoAlertsOn || force) {
                     await sendAlertsViaServer(getSelectedAuthorities(), damaged, { force: false });
                 }
                 setMonitorStatus(`${damaged.length} critical · last scan ${stamp}`, 'rose');
             } else {
                 setMonitorStatus(`All normal · last scan ${stamp}`, 'emerald');
-                if (force) showToast('Scan complete: sab kuch normal hai.', 'success');
+                if (force) showToast('Scan complete: everything is normal.', 'success');
             }
             scanInProgress = false;
         }
@@ -610,17 +610,17 @@
             }
         }
 
-        // Manual button: abhi turant bhejo (cooldown ignore)
+        // Manual button: send immediately (ignores cooldown)
         function broadcastToAllSelected() {
             const damaged = detectDamage();
             if (!damaged.length) {
-                showToast('Abhi koi critical damage nahi hai.', 'info');
+                showToast('No critical damage right now.', 'info');
                 return;
             }
             sendAlertsViaServer(getSelectedAuthorities(), damaged, { force: true });
         }
 
-        // Ek defect ka alert (modal se)
+        // Alert for a single defect (from modal)
         function dispatchDefectAlert() {
             if (!selectedDefect) return;
             sendAlertsViaServer(getSelectedAuthorities(), [selectedDefect], { force: true });
@@ -663,7 +663,7 @@
 
         function closeModal() { hideModal('detail-modal'); }
 
-        // Simple 24hr strain curve (seeded, taaki har baar same dikhe)
+        // Simple 24hr strain curve (seeded so it looks the same every time)
         function drawStrainChart(d) {
             const canvas = document.getElementById('chart-canvas');
             const dpr = window.devicePixelRatio || 1;
@@ -853,7 +853,7 @@
             a.download = name;
             a.click();
             URL.revokeObjectURL(a.href);
-            showToast('Report download ho gayi.', 'success');
+            showToast('Report downloaded.', 'success');
         }
 
         /* =====================================================================
@@ -928,7 +928,7 @@
             buildKITBoysHostelModel();
             createDefectVisualizers();
 
-            // Render modes ke liye har mesh ka original material yaad rakho
+            // Remember each mesh's original material for render modes
             [brickGroup, columnsGroup, stairsGroup].forEach(g => g.traverse(c => {
                 if (c.isMesh) c.userData.defaultMaterial = c.material;
             }));
@@ -1093,7 +1093,7 @@
         }
 
         /* =====================================================================
-           8. CALLOUT LINE (sirf selected defect ke liye, taaki UI saaf rahe)
+           8. CALLOUT LINE (only for the selected defect, to keep the UI clean)
         ===================================================================== */
         function updateSVGCallouts() {
             const svg = document.getElementById('callout-svg');
@@ -1155,7 +1155,7 @@
 
         let camAnimId = 0;
         function animateCameraTo(targetPos, targetLookAt) {
-            const myId = ++camAnimId;   // purani animation cancel
+            const myId = ++camAnimId;   // cancel old animation
             let step = 0;
             function tick() {
                 if (myId !== camAnimId || step >= 30) return;
@@ -1258,8 +1258,8 @@
             initThree();
             focusOnDefect(defectsData[0].id);
             renderWeakSpotsList();
-            focusOnDefect(defectsData[0].id);   // list render hone ke baad card highlight
-            startAutoMonitor();                 // <-- automatic alert yahin se shuru hota hai
+            focusOnDefect(defectsData[0].id);   // highlight card after list renders
+            startAutoMonitor();                 // <-- automatic alerts start here
         });
     </script>
 </body>
