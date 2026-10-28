@@ -149,3 +149,21 @@
                     </button>
                 </div>
             </div>
+            <!-- 2. RENDER VIEW MODES -->
+            <div class="p-4 border-b border-slate-800">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">3D Rendering Mode</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setRenderMode('solid')" id="btn-mode-solid" class="mode-btn px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium border border-blue-500 transition text-left flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-building text-xs"></i> Brick & Concrete
+                    </button>
+                    <button onclick="setRenderMode('xray')" id="btn-mode-xray" class="mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-xs"></i> X-Ray View
+                    </button>
+                    <button onclick="setRenderMode('wireframe')" id="btn-mode-wireframe" class="mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2">
+                        <i class="fa-solid fa-border-all text-xs"></i> Structural Mesh
+                    </button>
+                    <button onclick="setRenderMode('heatmap')" id="btn-mode-heatmap" class="mode-btn px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-medium border border-slate-700 transition text-left flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-xs"></i> Stress Heatmap
+                    </button>
+                </div>
+            </div
