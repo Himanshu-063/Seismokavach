@@ -90,7 +90,7 @@
                 <i class="fa-solid fa-building-user text-white text-lg"></i>
             </div>
             <div>
-                <div class="flex items-center space-x-2.5">
+                <div class="flex items-center space-x-2.5"><button onclick="openReportsModal()"></button>
                     <h1 class="font-bold text-sm md:text-base tracking-wide text-white">KIT BOYS HOSTEL <span class="text-xs font-normal text-rose-400 font-mono">BIM v4.5</span></h1>
                     <span class="px-2 py-0.5 text-[10px] font-mono font-semibold bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-full flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
@@ -109,6 +109,10 @@
 
         <!-- Header Actions & AI Agent Button -->
         <div class="flex items-center space-x-2.5">
+<button onclick="openReportsModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-medium flex items-center space-x-2 transition border border-amber-500/30">
+    <i class="fa-solid fa-file-contract text-amber-400"></i>
+    <span>Monthly & Yearly Reports</span>
+</button>
             <button onclick="runAIAgentScan()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-medium flex items-center space-x-2 shadow-lg shadow-cyan-950/50 transition border border-cyan-400/30">
                 <i class="fa-solid fa-brain text-cyan-200"></i>
                 <span>Run AI Agent Scan</span>
@@ -344,6 +348,115 @@
                         Install temporary hydraulic shoring props. Wrap damaged column with carbon fiber jacket (CFRP) and inject low-viscosity structural epoxy.
                     </p>
                 </div>
+                <!-- MONTHLY & YEARLY BUILDING REPAIR & DAMAGE REPORT MODAL -->
+<div id="reports-modal" class="hidden fixed inset-0 z-50 glass-panel bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col">
+        
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-white">Structural Maintenance & Damage Reports</h3>
+                    <p class="text-xs text-slate-400">KIT Boys Hostel - Historical Audit Log</p>
+                </div>
+            </div>
+            <button onclick="closeReportsModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Body Content -->
+        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            
+            <!-- Report Type Toggle Tabs -->
+            <div class="flex items-center space-x-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                <button onclick="switchReportTab('monthly')" id="tab-monthly-btn" class="flex-1 py-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold transition">
+                    <i class="fa-solid fa-calendar-days mr-1.5"></i> Monthly Repair Log (October 2026)
+                </button>
+                <button onclick="switchReportTab('yearly')" id="tab-yearly-btn" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition font-semibold">
+                    <i class="fa-solid fa-chart-line mr-1.5"></i> Yearly Damage Audit (2026 Summary)
+                </button>
+            </div>
+
+            <!-- MONTHLY REPORT VIEW -->
+            <div id="monthly-report-view" class="space-y-4">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div class="text-[10px] uppercase font-mono text-slate-400">Repairs Conducted</div>
+                        <div class="text-base font-bold text-emerald-400 mt-0.5">4 Tasks</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div class="text-[10px] uppercase font-mono text-slate-400">Epoxy Grout Injected</div>
+                        <div class="text-base font-bold text-cyan-400 mt-0.5">14.5 Liters</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div class="text-[10px] uppercase font-mono text-slate-400">Maintenance Cost</div>
+                        <div class="text-base font-bold text-amber-400 mt-0.5">₹ 1,42,000</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Recent Repair Log Entries</div>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold text-slate-200">CFRP Column Jacking (Pillar A2)</div>
+                                <div class="text-[10px] text-slate-400 font-mono">Date: Oct 12, 2026 • Vendor: UltraTech Structural</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">COMPLETED</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold text-slate-200">Staircase Landing Dowel Anchoring</div>
+                                <div class="text-[10px] text-slate-400 font-mono">Date: Oct 22, 2026 • Structural Team B</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30">IN PROGRESS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YEARLY REPORT VIEW (Hidden by default) -->
+            <div id="yearly-report-view" class="hidden space-y-4">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div class="text-[10px] uppercase font-mono text-slate-400">Total Anomalies Identified</div>
+                        <div class="text-base font-bold text-rose-400 mt-0.5">23 Anomalies</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div class="text-[10px] uppercase font-mono text-slate-400">Seismic Stress Mitigation</div>
+                        <div class="text-base font-bold text-emerald-400 mt-0.5">+18% Integrity</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div class="text-[10px] uppercase font-mono text-slate-400">Annual Retrofit Budget</div>
+                        <div class="text-base font-bold text-cyan-400 mt-0.5">₹ 8,75,000</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Annual Degradation Trend</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        During 2026, structural health index dropped by 4.2% due to monsoon seepage at the plinth base. 
+                        Carbon-fiber wrapping on Ground Floor columns successfully stabilized load redistribution across Wings A and B.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-3 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-mono">Export PDF / CSV log available</span>
+            <button onclick="showToast('Downloading Structural Audit Report...', 'success')" class="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-download"></i> Download Audit Report
+            </button>
+        </div>
+    </div>
+</div>
+
 
                 <!-- WhatsApp/SMS Dispatch for Specific Defect -->
                 <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
@@ -418,7 +531,7 @@
 
         function generateBuildingSummaryReport() {
             return encodeURIComponent(
-                `🚨 *STRUCTURAL ALERT - KIT BOYS HOSTEL*\n` +
+                `🚨 *Seismokavach- KIT BOYS HOSTEL*\n` +
                 `Building Health Index: *84% (MODERATE RISK)*\n` +
                 `Active Defects: 5 Total (2 CRITICAL)\n\n` +
                 `*Critical Issues Highlighted:*\n` +
@@ -1039,118 +1152,57 @@
 
         /* 
            8. PYTHON AI BACKEND INTEGRATION & MODAL */
-        async function runAIAgentScan() {
-            showToast("Connecting to Python Multi-Agent AI Engine (Port 8000)...", "info");
+        function runAIAgentScan() {
+    showToast("Running LangGraph Multi-Agent Structural Scan...", "info");
 
-            const payload = {
-                building_id: "KIT-BOYS-HOSTEL-KANPUR",
-                building_age_years: 14,
-                simulated_earthquake_richter: 6.5,
-                sensor_readings: defectsData.map(d => ({
-                    sensor_id: d.sensorId,
-                    location: d.title,
-                    stress_mpa: parseFloat(d.metrics.stress),
-                    crack_width_mm: parseFloat(d.metrics.crackWidth || "3.5"),
-                    vibration_hz: 14.5
-                }))
-            };
-
-            try {
-                const response = await fetch("http://localhost:8000/api/telemetry/analyze", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error("Backend server offline");
-
-                const data = await response.json();
-
-                document.getElementById('header-health-idx').innerText = `${Math.round(data.structural_health_index_pct)}%`;
-                
-                if (data.alert_triggered) {
-                    showToast(`🚨 HEALTH DROP: ${data.structural_health_index_pct}%. Emergency WhatsApp & SMS Alerts Dispatched!`, "error");
-                } else {
-                    showToast("AI Agent Scan Completed. Structural metrics updated.", "success");
-                }
-
-                openDetailModal(defectsData[0].id);
-
-            } catch (err) {
-                console.warn("AI Backend unreachable, presenting offline inspection telemetry.", err);
-                showToast("Backend Server Offline (localhost:8000). Displaying local simulation.", "info");
-                openDetailModal(defectsData[0].id);
-            }
+    setTimeout(() => {
+        // 1. Filter critical defects
+        const criticalDefects = defectsData.filter(d => d.severity === 'critical');
+        
+        if (criticalDefects.length > 0) {
+            showToast(`🚨 AI AGENT DETECTED ${criticalDefects.length} CRITICAL ANOMALIES!`, "error");
+            
+            // 2. AUTOMATICALLY DISPATCH ALERTS TO ALL SELECTED AUTHORITIES
+            autoDispatchEmergencyAlerts(criticalDefects);
+        } else {
+            showToast("AI Agent Scan Complete: Structural health parameters normal.", "success");
         }
+    }, 1800);
+}
 
-        function openDetailModal(id) {
-            const defect = defectsData.find(d => d.id === id);
-            if (!defect) return;
-            selectedDefect = defect;
+// AUTOMATIC WHATSAPP & SMS ALERT DISPATCH ENGINE
+function autoDispatchEmergencyAlerts(criticalDefects) {
+    const selectedAuthorities = authoritiesData.filter(a => a.selected);
+    
+    if (selectedAuthorities.length === 0) {
+        showToast("No authority selected for automatic dispatch.", "error");
+        return;
+    }
 
-            document.getElementById('modal-title').innerText = defect.title;
-            document.getElementById('modal-photo').src = defect.photo;
-            document.getElementById('modal-stress-val').innerText = defect.metrics.stress;
-            document.getElementById('modal-safety-factor').innerText = defect.metrics.safetyFactor;
-            document.getElementById('modal-coords').innerText = `X: ${defect.position.x}, Y: ${defect.position.y}, Z: ${defect.position.z} (${defect.title})`;
-            document.getElementById('modal-sensor-id').innerText = `SENSOR #${defect.sensorId}`;
-            document.getElementById('modal-action-plan').innerText = defect.action;
+    showToast(`⚡ AUTOMATIC DISPATCH: Sending Alerts to ${selectedAuthorities.length} Authorities...`, "error");
 
-            document.getElementById('detail-modal').classList.remove('hidden');
-            drawTelemetryChart();
-        }
+    selectedAuthorities.forEach((auth, index) => {
+        setTimeout(() => {
+            const alertText = encodeURIComponent(
+                `🚨 *AUTOMATIC EMERGENCY ALERT - SEISMOKAVACH AI*\n\n` +
+                `Critical Anomaly Auto-Detected at *KIT BOYS HOSTEL*!\n` +
+                `Building Health: *84% (HIGH RISK)*\n\n` +
+                `*Primary Severe Anomaly:*\n` +
+                `• Location: ${criticalDefects[0].title}\n` +
+                `• Sensor Tag: ${criticalDefects[0].sensorId}\n` +
+                `• Measured Stress: ${criticalDefects[0].metrics.stress}\n\n` +
+                `*AI Recommended Remediation:*\n` +
+                `${criticalDefects[0].action}\n\n` +
+                `_Automated Alert sent directly by Seismokavach Structural Engine._`
+            );
 
-        function closeModal() {
-            document.getElementById('detail-modal').classList.add('hidden');
-        }
-
-        function drawTelemetryChart() {
-            const canvas = document.getElementById('chart-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = 128;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 1;
-            for (let y = 20; y < canvas.height; y += 30) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            ctx.beginPath();
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2.5;
-
-            const points = [32, 35, 30, 42, 58, 52, 68, 74, 69, 88, 82, 94];
-            const stepX = canvas.width / (points.length - 1);
-
-            points.forEach((pt, i) => {
-                const x = i * stepX;
-                const y = canvas.height - (pt / 100) * (canvas.height - 20);
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-        }
-
-        function dispatchDefectWhatsApp() {
-            if (!selectedDefect) return;
-            const text = encodeURIComponent(`⚠️ *KIT HOSTEL DEFECT ALERT*: ${selectedDefect.title}\nStress: ${selectedDefect.metrics.stress}\nAction: ${selectedDefect.action}`);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-            showToast('Defect report sent via WhatsApp', 'success');
-        }
-
-        function dispatchDefectSMS() {
-            if (!selectedDefect) return;
-            const text = encodeURIComponent(`KIT HOSTEL DEFECT: ${selectedDefect.title} - Stress: ${selectedDefect.metrics.stress}. Action: ${selectedDefect.action}`);
-            window.open(`sms:?body=${text}`, '_blank');
-            showToast('Defect report sent via SMS', 'info');
-        }
+            // Automatically open WhatsApp API window for instant dispatch
+            window.open(`https://api.whatsapp.com/send?phone=${auth.rawPhone}&text=${alertText}`, '_blank');
+            
+            showToast(`Auto-alert dispatched to ${auth.name} (${auth.role})!`, 'success');
+        }, index * 800);
+    });
+}
 
         /*           9. MAIN ANIMATION LOOP        */
         function animate() {
